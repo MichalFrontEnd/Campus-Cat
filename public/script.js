@@ -2,6 +2,10 @@
 
 const canvas = $("#canvas");
 const ctx = canvas[0].getContext("2d");
+
+const submit = $("#submit");
+const clear = $("#clear");
+
 //let drawing = false;
 canvas.height = 80;
 canvas.width = 400;
@@ -12,7 +16,14 @@ let offsetY = canvas.offset().top;
 let mousePos = { x: 0, y: 0 };
 let lastPos = mousePos;
 
-canvas.on("mousemove mousedown", (e) => {
+canvas.on("mousedown", (e) => {
+    //console.log("mouse clicked on canvas!");
+    drawing = true;
+    lastPos = getMousePos(canvas, e);
+
+});
+
+canvas.on("mousemove", (e) => {
     //console.log("mouse clicked on canvas!");
     userX = `${e.clientX}`;
     userY = `${e.clientY}`;
@@ -25,7 +36,19 @@ canvas.on("mousemove mousedown", (e) => {
     }
 });
 
-canvas.on("mouseup", (e) => {});
+
+canvas.on("mouseup", (e) => {
+    drawing = false;
+});
+
+clear.on("click", (e) => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+})
+
+submit.on("click", (e) => {
+    var dataUrl = canvas.toDataURL();
+    console.log('dataUrl: ', dataUrl);
+})
 
 function getMousePos(canvas, mouseEvent) {
     return {
