@@ -12,6 +12,8 @@ app.set("view engine", "handlebars");
 
 const db = require("./db");
 
+let signers;
+
 app.get("/", (req, res) => {
     res.redirect("/petition");
 });
@@ -34,11 +36,23 @@ app.post("/petition", (req, res) => {
     db.addSignatures(req.body.first, req.body.last, req.body.signature)
         .then(() => {
             // any code I write here will run after addCity has run
-            console.log("hi");
+            //console.log("hi");
         })
         .catch((err) => {
             console.log("err in POST /add-signature: ", err);
         });
+    res.redirect("/thankyou");
+});
+
+app.get("/thankyou", (req, res) => {
+    db.sigNumber().then((results) => {
+        console.log("results: ", results.rows[0].id);
+        signers = results.rows[0].id;
+    });
+    res.render("thankyou", {
+        layout: "main",
+        signatures: `check out all ${signers} signatures!`,
+    });
 });
 
 //app.use(

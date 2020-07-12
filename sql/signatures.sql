@@ -1,3 +1,6 @@
+  
+-- psql caper-petition -f  sql/signatures.sql
+
 DROP TABLE IF EXISTS signatures;
 
 CREATE TABLE signatures(

@@ -20,6 +20,16 @@ module.exports.addSignatures = (first, last, signature) => {
     return db.query(q, params);
 };
 
+module.exports.sigNumber = (id) => {
+    let q = "SELECT * FROM signatures ORDER BY id DESC LIMIT 1";
+    //let q = "SELECT MAX(id) FROM signatures";
+    let param = id;
+    //console.log("params: ", param);
+    console.log("q: ", q);
+    return db.query(q, param);
+};
+//return db.query(q);
+//};
 // module.exports.addCity = (city, country) => {
 // 	return db.query("INSERT INTO cities (city, country) VALUES ($1, $2)", [
 // 		city,
