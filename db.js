@@ -14,7 +14,8 @@ module.exports.getSignatures = function () {
 
 module.exports.addSignatures = (first, last, signature) => {
     let q =
-        "INSERT INTO signatures (first, last, signature) VALUES ($1, $2, $3)";
+        "INSERT INTO signatures (first, last, signature) VALUES ($1, $2, $3) RETURNING id";
+
     // "params" is something you ONLY have to do IF the query takes arguments
     let params = [first, last, signature];
     return db.query(q, params);

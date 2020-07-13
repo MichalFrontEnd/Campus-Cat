@@ -3,7 +3,7 @@ const app = express();
 
 const cookieSession = require("cookie-session");
 
-const { body, validationResult, sanitizeBody } = require("express-validator");
+//const { body, validationResult, sanitizeBody } = require("express-validator");
 
 app.use(
     cookieSession({
@@ -32,7 +32,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/petition", (req, res) => {
-    req.session.hasSigId = "id";
     if (req.session.hasSigId === "id") {
         res.redirect("/thankyou");
     } else {
@@ -77,8 +76,10 @@ app.post(
         //    //return res.status(422).json({ errors: errors.array() });
         //}
         //console.log("info: ", req.body);
+
         db.addSignatures(req.body.first, req.body.last, req.body.signature)
             .then(() => {
+                req.session.hasSigId = "id";
                 // any code I write here will run after addCity has run
                 res.redirect("/thankyou");
             })
@@ -95,11 +96,13 @@ app.post(
 app.get("/thankyou", (req, res) => {
     db.sigNumber()
         .then((results) => {
-            //console.log("results: ", results.rows[0].id);
+            //console.log("results: ", results);
             signers = results.rows[0].id;
             res.render("thankyou", {
                 layout: "main",
+                thanks: `Thank you ${results.rows[0].first}, for signing the petition!`,
                 signatures: `check out all ${signers} signatures!`,
+                dataUrl: `${results.rows[0].signature}`,
             });
         })
         .catch((err) => {
