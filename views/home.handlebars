@@ -1,5 +1,8 @@
 <h1>Campus Cat</h1>
 <form method="POST">
+    {{#if error}}
+    <h3>please fill in all fields!</h3>
+    {{/if}}
     <input name="first" placeholder="first name" type="text">
     <input name="last" placeholder="last name" type="text">
     <input id="signature" name="signature" type="hidden">

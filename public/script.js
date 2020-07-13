@@ -49,7 +49,7 @@ clear.on("click", (e) => {
 
 submit.on("click", (e) => {
     //do something to dataUrl
-    dataUrl = canvas[0].toDataURL("image/jpeg", 0.1);
+    dataUrl = canvas[0].toDataURL("image/png", 0.1);
     let sigField = $("#signature");
     sigField.val(dataUrl);
 });

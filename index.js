@@ -3,9 +3,11 @@ const app = express();
 
 const cookieSession = require("cookie-session");
 
+const { body, validationResult, sanitizeBody } = require("express-validator");
+
 app.use(
     cookieSession({
-        secret: `I'm always angry.`,
+        secret: `Cats are the best.`,
         maxAge: 1000 * 60 * 60 * 24 * 14,
     })
 );
@@ -26,35 +28,69 @@ let first;
 let last;
 
 app.get("/", (req, res) => {
-    console.log("let's see...");
     res.redirect("/petition");
 });
 
 app.get("/petition", (req, res) => {
-    res.render("home", {
-        layout: "main",
-    });
-    db.getSignatures()
-        .then((results) => {
-            //console.log("getSignature results: ", results);
-        })
-        .catch((err) => {
-            console.log("err in GET /petition: ", err);
+    req.session.hasSigId = "id";
+    if (req.session.hasSigId === "id") {
+        res.redirect("/thankyou");
+    } else {
+        res.render("home", {
+            layout: "main",
         });
+        db.getSignatures()
+            .then((results) => {
+                //console.log("getSignature results: ", results);
+            })
+            .catch((err) => {
+                console.log("err in GET /petition: ", err);
+            });
+    }
 });
 
-app.post("/petition", (req, res) => {
-    //console.log("info: ", req.body);
-    db.addSignatures(req.body.first, req.body.last, req.body.signature)
-        .then(() => {
-            // any code I write here will run after addCity has run
-            console.log("hi");
-        })
-        .catch((err) => {
-            console.log("err in POST /petition: ", err);
-        });
-    res.redirect("/thankyou");
-});
+app.post(
+    "/petition",
+    //[
+    //    body("first")
+    //        .isLength({ min: 1 })
+    //        .trim()
+    //        .withMessage("No name was entered.")
+    //        .isAlpha()
+    //        .withMessage("Name must be alphabet letters."),
+    //    body("last")
+    //        .isLength({ min: 1 })
+    //        .trim()
+    //        .escape()
+    //        .withMessage("No name was entered.")
+    //        .isAlpha()
+    //        .withMessage("Name must be alphabet letters."),
+    //],
+    (req, res) => {
+        //const errors = validationResult(req);
+        //if (!errors.isEmpty()) {
+        //    res.render("/petition", {
+        //        layout: "main",
+        //        message: "please fill in all fields",
+        //    });
+
+        //    //return res.status(422).json({ errors: errors.array() });
+        //}
+        //console.log("info: ", req.body);
+        db.addSignatures(req.body.first, req.body.last, req.body.signature)
+            .then(() => {
+                // any code I write here will run after addCity has run
+                res.redirect("/thankyou");
+            })
+            .catch((err) => {
+                console.log("err in POST /petition: ", err);
+                res.render("home", {
+                    layout: "main",
+                    error: true,
+                });
+            });
+    }
+);
 
 app.get("/thankyou", (req, res) => {
     db.sigNumber()
