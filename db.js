@@ -22,10 +22,11 @@ module.exports.addSignatures = (first, last, signature) => {
 
 module.exports.sigNumber = (id) => {
     let q = "SELECT * FROM signatures ORDER BY id DESC LIMIT 1";
+    //"SELECT COUNT(*) FROM signatures";
     //let q = "SELECT MAX(id) FROM signatures";
     let param = id;
     //console.log("params: ", param);
-    console.log("q: ", q);
+    //console.log("q: ", q);
     return db.query(q, param);
 };
 //return db.query(q);
@@ -36,3 +37,10 @@ module.exports.sigNumber = (id) => {
 // 		country,
 // 	]);
 // };
+
+module.exports.getNames = () => {
+    let q = "SELECT first, last FROM signatures";
+    // "params" is something you ONLY have to do IF the query takes arguments
+    //console.log("q: ", q);
+    return db.query(q);
+};
