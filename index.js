@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 
 const cookieSession = require("cookie-session");
+const { hash, compare } = require("./bc");
 
 //const { body, validationResult, sanitizeBody } = require("express-validator");
 
@@ -28,14 +29,31 @@ let first;
 let last;
 
 app.get("/", (req, res) => {
-    res.redirect("/petition");
+    res.redirect("/reg");
+});
+
+app.get("/reg", (req, res) => {
+    res.render("reg", {
+        layout: "main",
+    });
+});
+app.post("/reg", (req, res) => {
+
+});
+app.get("/login", (req, res) => {
+    res.render("login", {
+        layout: "main",
+    });
+});
+app.post("/login", (req, res) => {
+
 });
 
 app.get("/petition", (req, res) => {
     if (req.session.hasSigId === "id") {
         res.redirect("/thankyou");
     } else {
-        res.render("home", {
+        res.render("petition", {
             layout: "main",
         });
         db.getSignatures()
