@@ -7,6 +7,9 @@ hash = promisify(hash);
 compare = promisify(compare);
 
 module.exports.compare = compare;
+//("puserPw", "hashedPw").then((matchValueCompare) => {
+//    console.log("do plaintext and hashedpw match?", matchValueCompare);
+//});;
 module.exports.hash = (plainTxPw) =>
     genSalt().then((salt) => hash(plainTxPw, salt));
 

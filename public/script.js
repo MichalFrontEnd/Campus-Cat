@@ -5,6 +5,9 @@ const ctx = canvas[0].getContext("2d");
 
 const submit = $("#submit");
 const clear = $("#clear");
+////I want to have an event handler that makes all buttons work with "enter"
+
+//const button = $("button");
 
 let dataUrl;
 
@@ -39,6 +42,7 @@ canvas.on("mousemove", (e) => {
 
 canvas.on("mouseup", (e) => {
     drawing = false;
+    dataUrl = canvas[0].toDataURL("image/png", 0.1);
 
     //console.log("dataUrl: ", dataUrl);
 });
@@ -49,10 +53,19 @@ clear.on("click", (e) => {
 
 submit.on("click", (e) => {
     //do something to dataUrl
-    dataUrl = canvas[0].toDataURL("image/png", 0.1);
+
     let sigField = $("#signature");
     sigField.val(dataUrl);
 });
+
+//submit.on("keydown", (e) => {
+//    //do something to dataUrl
+//    if (e.which === 13) {
+//        let sigField = $("#signature");
+//        sigField.val(dataUrl);
+//    }
+
+//});
 
 function getMousePos(canvas, mouseEvent) {
     return {

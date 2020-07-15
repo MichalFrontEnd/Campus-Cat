@@ -1,14 +1,16 @@
 {{!--registration--}}
 
-{{!--login--}}
-
+{{!--Error handling--}}
+{{#if error}}
+<h3>please fill in all fields!</h3>
+{{/if}}
 {{!--<img>--}}
+
+
 <h1>Bla bla support the cause</h1>
 
 <form method="POST">
-    {{#if error}}
-    <h3>please fill in all fields!</h3>
-    {{/if}}
+
     <input name="first" type="text">
     <label>Your Name</label>
     <br>
@@ -23,5 +25,5 @@
     <br>
     <button type="submit" id="signup">Sign up!</button>
     <br>
-</form>>
+</form>
 <p>Already a member? please <a href="/login">log in</a>.</p>

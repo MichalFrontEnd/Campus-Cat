@@ -1,20 +1,22 @@
 {{!--login--}}
+{{!--Error handling--}}
+{{#if error}}
+<h3>incorrect username or password</h3>
+{{/if}}
 
 {{!--<img>--}}
 <h1>Glad to see you again!</h1>
-<h3>So nice of you to come back.<br>
+<h3>So nice of you to still care.<br>
     Please log in:
 </h3>
 <form method="POST">
-    {{#if error}}
-    <h3>incorrect username or password</h3>
-    {{/if}}
+
 
     <input name="email" type="text">
     <label>Your Email Address</label>
     <br>
     <input name="pwd" type="password">
-    <label>Your Brand New Password</label>
+    <label>Your Password</label>
     <br>
     <button type="submit" id="signup">Log in</button>
     <br>
