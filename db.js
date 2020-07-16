@@ -1,5 +1,5 @@
 const spicedPg = require("spiced-pg");
-const db = spicedPg("postgres:postgres:postgres@localhost:5432/caper-petition");
+const db = spicedPg(process.env.DATABASE_URL || "postgres:postgres:postgres@localhost:5432/caper-petition");
 
 
 module.exports.getSignatures = function() {
@@ -16,12 +16,12 @@ module.exports.logCreds = (first, last, email, pwd) => {
     let q = "INSERT INTO users (first, last, email, pwd) VALUES ($1, $2, $3, $4)RETURNING id";
 
     let params = [first, last, email, pwd];
-    console.log("params:", params);
+    //console.log("params:", params);
     return db.query(q, params);
 };
 
 module.exports.getPwd = function(email) {
-    let q = "SELECT pwd, id FROM users WHERE email = $1";
+    let q = "SELECT pwd, id FROM users WHERE email = ($1, $2)";
     let params = [email];
     return db.query(q, params);
 };
@@ -35,22 +35,23 @@ module.exports.addSignatures = (user_id, signature) => {
     let q =
         "INSERT INTO signatures (user_id, signature) VALUES ($1, $2) RETURNING id";
     let params = [user_id, signature];
+    console.log('params in addSignature: ', params);
     return db.query(q, params);
 };
 
-module.exports.sigNumber = (id) => {
-    let q = "SELECT * FROM signatures ORDER BY id DESC LIMIT 1";
-    //let q = "SELECT COUNT(*) FROM signatures";
+module.exports.sigNumber = () => {
+    //let q = "SELECT * FROM signatures ORDER BY id DESC LIMIT 1";
+    let q = "SELECT COUNT(*) FROM signatures";
     //let q = "SELECT MAX(id) FROM signatures";
-    let param = id;
+    //let param = id;
     //console.log("params: ", param);
     //console.log("q: ", q);
-    return db.query(q, param);
+    return db.query(q);
 };
 
 module.exports.getSigUrl = (id) => {
     let q = "SELECT signature FROM signatures WHERE id = $1";
-    let params = id;
+    let params = [id];
     return db.query(q, params);
 }
 

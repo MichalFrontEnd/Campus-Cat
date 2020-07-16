@@ -33,9 +33,11 @@ app.get("/", (req, res) => {
     res.redirect("/reg");
 });
 
+
+
 app.get("/reg", (req, res) => {
-    //if users have a signature or a user_id stored they are redirected to see their signature.
-    if (req.session.hasSigId || req.session.hasUserId) {
+    //if users have a signature or a user_id stored they are redirected to see their signature. Maybe can get rid.
+    if (req.session.hasSigId === true || req.session.hasUserId === true) {
         res.redirect("/thankyou");
     } else {
         res.render("reg", {
@@ -51,6 +53,7 @@ app.get("/reg", (req, res) => {
             });
     }
 });
+
 
 app.post("/reg", (req, res) => {
     //console.log('req.body: ', req.body);
@@ -71,7 +74,7 @@ app.post("/reg", (req, res) => {
             req.session.first = first;
             req.session.last = last;
 
-            res.redirect("/petition");
+            res.redirect("/newprofile");
 
         }).catch((err) => {
             console.log("err in logCreds in POST /reg: ", err);
@@ -90,6 +93,15 @@ app.post("/reg", (req, res) => {
     });
 });
 
+app.get("/newprofile", (req, res) => {
+    res.render("newprofile", {
+        layout: "main",
+    })
+})
+
+app.post("/newprofile", (req, res) => {
+
+})
 
 app.get("/login", (req, res) => {
     res.render("login", {
@@ -123,7 +135,8 @@ app.post("/login", (req, res) => {
                         req.session.hasUserId = true;
                         req.session.email = req.body.email;
                         req.session.user_id = results.rows[0].id
-                            //console.log('req.session after login credcomparison: ', req.session);
+                        req.session.loggedIn = true;
+                        //console.log('req.session after login credcomparison: ', req.session);
                         res.redirect("/petition");
                     } else {
                         res.render("login", {
@@ -153,6 +166,24 @@ app.post("/login", (req, res) => {
     }
 });
 
+//a middleware to redirect user. Doesn't seem to work.
+//app.use(function redirect(req, res, next) {
+//    if (!req.session.hasUserId) {
+//        res.redirect("/register");
+//        //    } else if (req.session.hasUserId) {
+//        //        if (req.session.loggedIn) {
+//        //            if (req.session.hasSigId) {
+//        //                res.redirect("/thankyou");
+//        //            } else {
+//        //                res.redirect("/petition");
+//        //            }
+//        //        } else {
+//        //            res.redirect("/login")
+//        //        }
+//    } else {
+//        next();
+//    }
+//});
 
 app.get("/petition", (req, res) => {
     //checks cookies if signed petition
@@ -182,11 +213,13 @@ app.post("/petition", (req, res) => {
             //console.log('req.body in addSignature: ', req.body);
             //console.log('req.session.user_id: ', req.session.user_id);
             //console.log('req.body.signature: ', req.body.signature);
-            //console.log('results in addSignature: ', results);
+            console.log('results in addSignature: ', results);
+
             //storing the signature id in the cookie
             req.session.hasSigId = true;
             req.session.sigId = results.rows[0].id
             res.redirect("/thankyou");
+            console.log('req.session after addSignatures: ', req.session);
         })
         .catch((err) => {
             console.log("err in POST /petition: ", err);
@@ -198,31 +231,30 @@ app.post("/petition", (req, res) => {
 });
 
 app.get("/thankyou", (req, res) => {
-    db.sigNumber(req.session.id)
+
+    db.sigNumber()
         .then((results) => {
+            //console.log("results from sigNumber: ", results);
             if (req.session.hasSigId) {
-                signers = results.rows[0].id;
-                db.getSigUrl(req.session.id).then((results) => {
-                        console.log('results in getSigUrl: ', results);
+                signers = results.rows[0].count;
+                db.getSigUrl(req.session.user_id).then((results) => {
+                    console.log('results in getSigUrl: ', results);
+                    res.render("thankyou", {
+                        layout: "main",
+                        thanks: `Thank you ${req.session.first}, for signing the petition!`,
+                        signatures: `check out all ${signers} signatures!`,
+                        //dataUrl: `${results.rows[0].signature}`,
                     })
-                    //console.log("results from sigNumber: ", results);
-                    //console.log("req.session in sigNumber ", req.session)
-                    //****here run a query that will get the signature */
-
-
-                //console.log('req.session after signing: ', req.session);
-                res.render("thankyou", {
-                    layout: "main",
-                    thanks: `Thank you ${req.session.first}, for signing the petition!`,
-                    signatures: `check out all ${signers} signatures!`,
-                    dataUrl: `${results.rows[0].signature}`,
-                });
+                }).catch((err) => {
+                    console.log("err in GET /thankyou getSigUrl: ", err);
+                })
             } else {
                 res.redirect("/petition");
             }
-        })
-        .catch((err) => {
-            console.log("err in GET /thankyou: ", err);
+
+
+        }).catch((err) => {
+            console.log("err in GET /thankyou get sigNumber: ", err);;
         });
 });
 
@@ -252,4 +284,5 @@ app.get("/signers", (req, res) => {
         });
 });
 
-app.listen(8080, () => console.log("petition server is listening..."));
+//if unning on Heroku liten on Heroku port(environment), otherwise, listen locally
+app.listen(process.env.PORT || 8080, () => console.log("petition server is listening..."));
