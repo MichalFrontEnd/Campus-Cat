@@ -1,10 +1,9 @@
+-- psql caper-petition -f  sql/profiles.sql
 
-DROP TABLE IF EXISTS signatures;
+DROP TABLE IF EXISTS profiles;
 
-CREATE TABLE signatures(
+CREATE TABLE profiles(
     id SERIAL PRIMARY KEY,
-    --first VARCHAR NOT NULL CHECK(first !=''),
-    --last VARCHAR NOT NULL CHECK(last !=''),
     user_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
     age INTEGER,
     city VARCHAR,

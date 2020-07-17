@@ -4,6 +4,7 @@ const cookieSession = require("cookie-session");
 const { hash, compare } = require("./bc");
 const hb = require("express-handlebars");
 const db = require("./db");
+const { requireLoggedOutUser, requireNoSignature } = require("./middleware")
 
 //const { body, validationResult, sanitizeBody } = require("express-validator");
 app.engine("handlebars", hb());
@@ -28,14 +29,13 @@ let email;
 let userPwd;
 let user_id;
 
-
 app.get("/", (req, res) => {
     res.redirect("/reg");
 });
 
 
 
-app.get("/reg", (req, res) => {
+app.get("/reg", requireLoggedOutUser, (req, res) => {
     //if users have a signature or a user_id stored they are redirected to see their signature. Maybe can get rid.
     if (req.session.hasSigId === true || req.session.hasUserId === true) {
         res.redirect("/thankyou");
@@ -100,7 +100,18 @@ app.get("/newprofile", (req, res) => {
 })
 
 app.post("/newprofile", (req, res) => {
+    //console.log('req.body in /newprofile: ', req.body);
 
+    if (req.body.age || req.body.city || req.body.homepage) {
+        db.logProfiles([req.body.age], req.body.city, req.body.homepage, req.session.user_id).then((results) => {
+            //console.log('results in logprofiles: ', results);
+            res.redirect("/petition")
+        }).catch((err) => {
+            console.log("error in post/newprofile", err)
+        })
+    } else {
+        res.redirect("/petition")
+    }
 })
 
 app.get("/login", (req, res) => {
@@ -121,7 +132,7 @@ app.post("/login", (req, res) => {
     //getting the hashed pwd from the db using the email.
     if (req.body.email) {
         db.getPwd(req.body.email).then((results) => {
-            //console.log('results from getPwd: ', results);
+
             if (!results.rows[0].pwd) {
                 res.render("login", {
                     layout: "main",
@@ -132,7 +143,7 @@ app.post("/login", (req, res) => {
                 compare(req.body.pwd, results.rows[0].pwd).then((matchValue) => {
                     //console.log('matchValue: ', matchValue);
                     if (matchValue === true) {
-                        req.session.hasUserId = true;
+                        req.session.hasUesrId = true;
                         req.session.email = req.body.email;
                         req.session.user_id = results.rows[0].id
                         req.session.loggedIn = true;
@@ -146,6 +157,10 @@ app.post("/login", (req, res) => {
                     }
                 }).catch((err) => {
                     console.log("error in compare");
+                    res.render("login", {
+                        layout: "main",
+                        error: true,
+                    })
                 });
             }
 
@@ -166,24 +181,6 @@ app.post("/login", (req, res) => {
     }
 });
 
-//a middleware to redirect user. Doesn't seem to work.
-//app.use(function redirect(req, res, next) {
-//    if (!req.session.hasUserId) {
-//        res.redirect("/register");
-//        //    } else if (req.session.hasUserId) {
-//        //        if (req.session.loggedIn) {
-//        //            if (req.session.hasSigId) {
-//        //                res.redirect("/thankyou");
-//        //            } else {
-//        //                res.redirect("/petition");
-//        //            }
-//        //        } else {
-//        //            res.redirect("/login")
-//        //        }
-//    } else {
-//        next();
-//    }
-//});
 
 app.get("/petition", (req, res) => {
     //checks cookies if signed petition
@@ -210,16 +207,13 @@ app.post("/petition", (req, res) => {
 
     db.addSignatures(req.session.user_id, req.body.signature)
         .then((results) => {
-            //console.log('req.body in addSignature: ', req.body);
-            //console.log('req.session.user_id: ', req.session.user_id);
-            //console.log('req.body.signature: ', req.body.signature);
-            console.log('results in addSignature: ', results);
+
 
             //storing the signature id in the cookie
             req.session.hasSigId = true;
             req.session.sigId = results.rows[0].id
             res.redirect("/thankyou");
-            console.log('req.session after addSignatures: ', req.session);
+            //console.log('req.session after addSignatures: ', req.session);
         })
         .catch((err) => {
             console.log("err in POST /petition: ", err);
@@ -238,12 +232,12 @@ app.get("/thankyou", (req, res) => {
             if (req.session.hasSigId) {
                 signers = results.rows[0].count;
                 db.getSigUrl(req.session.user_id).then((results) => {
-                    console.log('results in getSigUrl: ', results);
+                    //console.log('results in getSigUrl: ', results);
                     res.render("thankyou", {
                         layout: "main",
                         thanks: `Thank you ${req.session.first}, for signing the petition!`,
                         signatures: `check out all ${signers} signatures!`,
-                        //dataUrl: `${results.rows[0].signature}`,
+                        dataUrl: `${results.rows[0].signature}`,
                     })
                 }).catch((err) => {
                     console.log("err in GET /thankyou getSigUrl: ", err);
@@ -251,7 +245,6 @@ app.get("/thankyou", (req, res) => {
             } else {
                 res.redirect("/petition");
             }
-
 
         }).catch((err) => {
             console.log("err in GET /thankyou get sigNumber: ", err);;
@@ -264,15 +257,24 @@ app.get("/signers", (req, res) => {
         .then((results) => {
             //console.log("signers object :", results);
             for (let i = 0; i < results.rows.length; i++) {
-                //console.log("first: ", results.rows[0].first);
-                //console.log("last: ", results.rows[0].last);
 
                 first = results.rows[i].first;
                 last = results.rows[i].last;
-                names.push(`${first}       ${last}`);
-                //console.log("names: ", names);
-                //console.log("first: ", first);
-                //console.log("last: ", last);
+
+                if (!results.rows[i].age) {
+                    age = "";
+                } else {
+                    age = ", " + results.rows[i].age;
+                }
+
+                if (!results.rows[i].city) {
+                    city = "";
+                } else {
+                    city = ", " + results.rows[i].city;
+                }
+
+                names.push(`${first} ${last} ${age} ${city}`);
+
             }
             res.render("signers", {
                 layout: "main",

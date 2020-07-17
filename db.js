@@ -20,6 +20,13 @@ module.exports.logCreds = (first, last, email, pwd) => {
     return db.query(q, params);
 };
 
+module.exports.logProfiles = (age, city, homepage, user_id) => {
+    let q = "INSERT INTO profiles (age, city, homepage, user_id) VALUES ($1, $2, $3, $4)";
+
+    let params = [+age || null, city || null, homepage || null, user_id];
+    return db.query(q, params);
+}
+
 module.exports.getPwd = function(email) {
     let q = "SELECT pwd, id FROM users WHERE email = ($1, $2)";
     let params = [email];
@@ -35,7 +42,7 @@ module.exports.addSignatures = (user_id, signature) => {
     let q =
         "INSERT INTO signatures (user_id, signature) VALUES ($1, $2) RETURNING id";
     let params = [user_id, signature];
-    console.log('params in addSignature: ', params);
+    //console.log('params in addSignature: ', params);
     return db.query(q, params);
 };
 
@@ -50,14 +57,14 @@ module.exports.sigNumber = () => {
 };
 
 module.exports.getSigUrl = (id) => {
-    let q = "SELECT signature FROM signatures WHERE id = $1";
+    let q = "SELECT signature FROM signatures WHERE user_id = $1";
     let params = [id];
     return db.query(q, params);
 }
 
 module.exports.getNames = () => {
-    let q = "SELECT first, last FROM users";
+    let q = "SELECT first, last, age, city, homepage FROM users RIGHT JOIN signatures ON users.id=signatures.user_id LEFT JOIN profiles ON users.id = profiles.user_id";
     // "params" is something you ONLY have to do IF the query takes arguments
-    //console.log("q: ", q);
+    //console.log("q in getnames: ", q);
     return db.query(q);
 };
