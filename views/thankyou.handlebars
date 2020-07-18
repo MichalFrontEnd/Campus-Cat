@@ -3,9 +3,11 @@
 <h1>{{thanks}}</h1>
 <br>
 <img src="{{dataUrl}}">
-<form method="POST">
 
-    <button type="submit" id="deleteSig">🧶</button>
+<form method="POST">
+    <input type="hidden">
+    {{!--name="_csrf" value="{{csrfToken}}">--}}
+    <button id="deleteSig">🗑</button>
 </form>
 
 <a href="/signers">

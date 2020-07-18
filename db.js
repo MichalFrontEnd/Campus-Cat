@@ -108,3 +108,9 @@ module.exports.getCity = (city) => {
     let params = [city];
     return db.query(q, params);
 };
+
+module.exports.deleteSig = (id) => {
+    let q = "DELETE FROM signatures WHERE user_id = $1;";
+    let params = [id];
+    return db.query(q, params);
+};

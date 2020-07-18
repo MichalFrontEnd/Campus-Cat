@@ -265,6 +265,17 @@ app.get("/thankyou", (req, res) => {
         });
 });
 
+app.post("/thankyou", (req, res) => {
+    db.deleteSig(req.session.user_id)
+        .then((results) => {
+            req.session.hasSigId = false;
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log("error in deleteSig", err);
+        });
+});
+
 app.get("/signers", (req, res) => {
     db.getNames()
         .then((results) => {
