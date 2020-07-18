@@ -1,6 +1,7 @@
   
 -- psql caper-petition -f  sql/signatures.sql
-DROP TABLE IF EXISTS users;
+--
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users(
     id SERIAL PRIMARY KEY,
@@ -12,7 +13,7 @@ CREATE TABLE users(
 );
 
 
-DROP TABLE IF EXISTS signatures;
+DROP TABLE IF EXISTS signatures CASCADE;
 
 CREATE TABLE signatures(
     id SERIAL PRIMARY KEY,
@@ -23,7 +24,7 @@ CREATE TABLE signatures(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP TABLE IF EXISTS profiles;
+DROP TABLE IF EXISTS profiles CASCADE;
 
 CREATE TABLE profiles(
     id SERIAL PRIMARY KEY,

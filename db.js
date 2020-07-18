@@ -42,17 +42,12 @@ module.exports.addSignatures = (user_id, signature) => {
     let q =
         "INSERT INTO signatures (user_id, signature) VALUES ($1, $2) RETURNING id";
     let params = [user_id, signature];
-    //console.log('params in addSignature: ', params);
     return db.query(q, params);
 };
 
 module.exports.sigNumber = () => {
     //let q = "SELECT * FROM signatures ORDER BY id DESC LIMIT 1";
     let q = "SELECT COUNT(*) FROM signatures";
-    //let q = "SELECT MAX(id) FROM signatures";
-    //let param = id;
-    //console.log("params: ", param);
-    //console.log("q: ", q);
     return db.query(q);
 };
 
@@ -67,4 +62,37 @@ module.exports.getNames = () => {
     // "params" is something you ONLY have to do IF the query takes arguments
     //console.log("q in getnames: ", q);
     return db.query(q);
+};
+
+module.exports.getInfo = (id) => {
+    let q = "SELECT first, last, email, pwd, age, city, homepage FROM users LEFT JOIN profiles ON users.id = profiles.user_id WHERE users.id = $1";
+    // "params" is something you ONLY have to do IF the query takes arguments
+    //console.log("q in getnames: ", q);
+    let params = [id];
+    return db.query(q, params);
+};
+
+module.exports.updateInfo = (first, last, email, pwd, age, city, homepage) => {
+    let q = "WITH ins AS (INSERT INTO users (first, last, email, pwd) VALUES ($1, $2, $3, $4)ON CONFLICT (id) DO UPDATE first= $1, last = $2, email = $3, pwd = $4 RETURNING id), INSERT INTO profiles (age, city, homepage) VALUES ($5, $6, $7) ON CONFLICT (profiles.user_id) DO UPDATE age = $5, city = $6, homepage = $7 SELECT id from ins";
+
+    let params = [first, last, email, pwd, +age, city, homepage];
+    console.log("params:", params);
+    return db.query(q, params);
+};
+
+//module.exports.updateInfo = (first, last, email, pwd) => {
+//    let q = "INSERT INTO users (first, last, email, pwd) VALUES ($1, $2, $3, $4)ON CONFLICT (id) DO UPDATE first= $1, last = $2, email = $3, pwd = $4 RETURNING id";
+
+//    let params = [first || null, last || null, email || null, pwd || null];
+//    //console.log("params:", params);
+//    return db.query(q, params);
+//};
+
+
+module.exports.getCity = (city) => {
+    let q = "SELECT first, last, age, city, homepage FROM users RIGHT JOIN signatures ON users.id=signatures.user_id LEFT JOIN profiles ON users.id = profiles.user_id WHERE LOWER(city) = LOWER($1)";
+    // "params" is something you ONLY have to do IF the query takes arguments
+    //console.log("q in getnames: ", q);
+    let params = [city];
+    return db.query(q, params);
 };

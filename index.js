@@ -103,6 +103,13 @@ app.post("/newprofile", (req, res) => {
     //console.log('req.body in /newprofile: ', req.body);
 
     if (req.body.age || req.body.city || req.body.homepage) {
+        if (!req.body.homepage) {
+            req.body.hompage = "";
+        } else if (!req.body.homepage.startsWith("http://") && !req.body.homepage.startsWith("https://") && !req.body.homepage.startsWith("//")) {
+            req.body.homepage = "http://" + req.body.homepage;
+        }
+        req.session.homepage = req.body.homepage;
+
         db.logProfiles([req.body.age], req.body.city, req.body.homepage, req.session.user_id).then((results) => {
             //console.log('results in logprofiles: ', results);
             res.redirect("/petition")
@@ -133,36 +140,36 @@ app.post("/login", (req, res) => {
     if (req.body.email) {
         db.getPwd(req.body.email).then((results) => {
 
-            if (!results.rows[0].pwd) {
+            //if (!results.rows[0].pwd) {
+            //    res.render("login", {
+            //        layout: "main",
+            //        error: true,
+            //    })
+            //} else {
+            //comparing the user input pwd and the hashed pwd
+            compare(req.body.pwd, results.rows[0].pwd).then((matchValue) => {
+                //console.log('matchValue: ', matchValue);
+                if (matchValue === true) {
+                    req.session.hasUesrId = true;
+                    req.session.email = req.body.email;
+                    req.session.user_id = results.rows[0].id
+                    req.session.loggedIn = true;
+                    //console.log('req.session after login credcomparison: ', req.session);
+                    res.redirect("/petition");
+                } else {
+                    res.render("login", {
+                        layout: "main",
+                        error: true,
+                    });
+                }
+            }).catch((err) => {
+                console.log("error in compare");
                 res.render("login", {
                     layout: "main",
                     error: true,
                 })
-            } else {
-                //comparing the user input pwd and the hashed pwd
-                compare(req.body.pwd, results.rows[0].pwd).then((matchValue) => {
-                    //console.log('matchValue: ', matchValue);
-                    if (matchValue === true) {
-                        req.session.hasUesrId = true;
-                        req.session.email = req.body.email;
-                        req.session.user_id = results.rows[0].id
-                        req.session.loggedIn = true;
-                        //console.log('req.session after login credcomparison: ', req.session);
-                        res.redirect("/petition");
-                    } else {
-                        res.render("login", {
-                            layout: "main",
-                            error: true,
-                        });
-                    }
-                }).catch((err) => {
-                    console.log("error in compare");
-                    res.render("login", {
-                        layout: "main",
-                        error: true,
-                    })
-                });
-            }
+            });
+            //}
 
         }).catch((err) => {
             console.log("err in Post /login getting creds: ", err);
@@ -252,39 +259,71 @@ app.get("/thankyou", (req, res) => {
 });
 
 app.get("/signers", (req, res) => {
-    let names = [];
     db.getNames()
         .then((results) => {
-            //console.log("signers object :", results);
-            for (let i = 0; i < results.rows.length; i++) {
-
-                first = results.rows[i].first;
-                last = results.rows[i].last;
-
-                if (!results.rows[i].age) {
-                    age = "";
-                } else {
-                    age = ", " + results.rows[i].age;
-                }
-
-                if (!results.rows[i].city) {
-                    city = "";
-                } else {
-                    city = ", " + results.rows[i].city;
-                }
-
-                names.push(`${first} ${last} ${age} ${city}`);
-
-            }
             res.render("signers", {
                 layout: "main",
-                names,
+                names: results.rows,
             });
         })
-        .catch((err) => {
-            console.log("err in GET /signers: ", err);
-        });
+
+    .catch((err) => {
+        console.log("err in GET /signers: ", err);
+    });
 });
 
-//if unning on Heroku liten on Heroku port(environment), otherwise, listen locally
+app.get("/signers/:city", (req, res) => {
+    db.getCity(req.params.city).then((results) => {
+        res.render("signers", {
+            layout: "main",
+            names: results.rows,
+        });
+    })
+
+})
+
+app.get("/editprofile", (req, res) => {
+    db.getInfo(req.session.user_id).then((results) => {
+
+        res.render("editprofile", {
+            layout: "main",
+            info: results.rows,
+        });
+    }).catch((err) => {
+        console.log("error in GET editprofile", err)
+    })
+})
+
+app.post("/editprofile", (req, res) => {
+    //console.log('req.body in editprofile: ', req.body);
+    if (req.body.pwd) {
+        hash(req.body.pwd).then((hashedPwd) => {
+            req.body.pwd = hashedPwd;
+        })
+        console.log('req.body.pwd: ', req.body.pwd);
+        console.log('hashedPwd: ', hashedPwd);
+    }
+    if (!req.body.homepage) {
+        req.body.hompage = "";
+    } else if (!req.body.homepage.startsWith("http://") && !req.body.homepage.startsWith("https://") && !req.body.homepage.startsWith("//")) {
+        req.body.homepage = "http://" + req.body.homepage;
+    }
+    req.session.homepage = req.body.homepage;
+    console.log("am I getting here?")
+        //console.log('hashed user Pwd: ', hashedPwd);
+    db.updateInfo(req.body.first, req.body.last, req.body.email, req.body.pwd, req.body.age, req.body.city, req.body.homepage).then((results) => {
+        //console.log('results in updateInfo: ', results);
+
+
+        res.redirect("/")
+    }).catch((err) => { console.log("error in POST/editprofile", err) })
+});
+
+app.get("/logout", (req, res) => {
+    req.session = null;
+    res.redirect("/")
+
+})
+
+//if running on Heroku liten on Heroku port(environment), otherwise, listen locally
 app.listen(process.env.PORT || 8080, () => console.log("petition server is listening..."));
