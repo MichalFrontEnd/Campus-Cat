@@ -53,15 +53,16 @@ app.get("/reg", requireLoggedOutUser, (req, res) => {
 
 app.post("/reg", (req, res) => {
     //console.log('req.body: ', req.body);
-    first = req.body.first;
-    last = req.body.last;
-    email = req.body.email;
-    userPwd = req.body.pwd;
 
-    hash(userPwd)
+    hash(req.body.pwd)
         .then((hashedPwd) => {
             //console.log('hashed user Pwd: ', hashedPwd);
-            db.logCreds(first, last, email, hashedPwd)
+            db.logCreds(
+                req.body.first,
+                req.body.last,
+                req.body.email,
+                hashedPwd
+            )
                 .then((results) => {
                     //console.log('logCred results: ', results);
 
@@ -161,7 +162,7 @@ app.post("/login", (req, res) => {
                         if (matchValue === true) {
                             req.session.hasUesrId = true;
                             req.session.email = req.body.email;
-                            req.session.user_id = results.rows[0].id;
+                            //req.session.user_id = results.rows[0].id;
                             req.session.loggedIn = true;
                             //console.log('req.session after login credcomparison: ', req.session);
                             res.redirect("/petition");
@@ -188,8 +189,6 @@ app.post("/login", (req, res) => {
                     error: true,
                 });
             });
-
-        //console.log('req.body in post/login: ', req.body);
     } else {
         res.render("login", {
             layout: "main",
@@ -202,13 +201,12 @@ app.get("/petition", (req, res) => {
     //checks cookies if signed petition
     if (req.session.hasSigId) {
         res.redirect("/thankyou");
-        //} else if (req.session.hasUserId === "user_id") {
-        //    res.redirect("/login");
     } else {
         res.render("petition", {
             layout: "main",
         });
-        //selects all info from signature db
+        //selects all info from signature db. Is this needed?
+
         db.getSignatures()
             .then((results) => {
                 //console.log("getSignature results: ", results);
@@ -240,7 +238,6 @@ app.post("/petition", (req, res) => {
 app.get("/thankyou", (req, res) => {
     db.sigNumber()
         .then((results) => {
-            //console.log("results from sigNumber: ", results);
             if (req.session.hasSigId) {
                 signers = results.rows[0].count;
                 db.getSigUrl(req.session.user_id)
