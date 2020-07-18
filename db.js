@@ -32,7 +32,7 @@ module.exports.logProfiles = (age, city, homepage, user_id) => {
 };
 
 module.exports.getPwd = function (email) {
-    let q = "SELECT pwd, id FROM users WHERE email = ($1, $2)";
+    let q = "SELECT pwd, id FROM users WHERE email = ($1)";
     let params = [email];
     return db.query(q, params);
 };
@@ -83,7 +83,13 @@ module.exports.upsertInfo = (id, age, city, homepage) => {
         "INSERT INTO profiles (user_id, age, city, homepage) VALUES ($1, $2, $3, $4) ON CONFLICT (user_id) DO UPDATE SET age = $2, city = $3, homepage = $4 ";
 
     let params = [id, +age, city, homepage];
-    console.log("params:", params);
+    //console.log("params:", params);
+    return db.query(q, params);
+};
+
+module.exports.updatePassword = (id, pwd) => {
+    let q = "UPDATE users SET pwd = $2 WHERE id = $1";
+    let params = [id, pwd];
     return db.query(q, params);
 };
 

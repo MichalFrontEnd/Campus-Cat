@@ -291,6 +291,7 @@ app.get("/signers/:city", (req, res) => {
 app.get("/editprofile", (req, res) => {
     db.getInfo(req.session.user_id)
         .then((results) => {
+            console.log("password in editprofile", results.rows[0].pwd);
             res.render("editprofile", {
                 layout: "main",
                 info: results.rows,
@@ -302,27 +303,24 @@ app.get("/editprofile", (req, res) => {
 });
 
 app.post("/editprofile", (req, res) => {
-    console.log("req.body in editprofile: ", req.body);
     if (req.body.pwd) {
-        hash(req.body.pwd).then((hashedPwd) => {
-            req.body.pwd = hashedPwd;
-        });
         console.log("req.body.pwd: ", req.body.pwd);
-        console.log("hashedPwd: ", hashedPwd);
+        hash(req.body.pwd).then((hashedPwd) => {
+            console.log("hashedPwd: ", hashedPwd);
+            db.updatePassword(req.session.user_id, hashedPwd)
+                .then((results) => {
+                    //res.render("editprofile", {
+                    //    layout: "main",
+                    //    profileUpdate: true,
+                    //});
+                    //res.redirect("/editprofile");
+                })
+                .catch((err) => {
+                    console.log("error in updatePassword", err);
+                });
+        });
     }
-    //if (!req.body.homepage) {
-    //    req.body.hompage = "";
-    //} else if (
-    //    !req.body.homepage.startsWith("http://") &&
-    //    !req.body.homepage.startsWith("https://") &&
-    //    !req.body.homepage.startsWith("//")
-    //) {
-    //    req.body.homepage = "http://" + req.body.homepage;
-    //}
-    //req.session.homepage = req.body.homepage;
-    //console.log("am I getting here?");
-    //console.log('hashed user Pwd: ', hashedPwd);
-    //first, last, email, age, city, homepage, id
+
     Promise.all([
         db.updateInfo(
             req.session.user_id,
@@ -338,11 +336,14 @@ app.post("/editprofile", (req, res) => {
         ),
     ])
         .then((results) => {
-            console.log("results in updateInfo: ", results);
+            profileUpdate = true;
             if (req.body.first) {
                 req.session.first = req.body.first;
             }
-            res.redirect("/editprofile");
+            res.render("editprofile", {
+                layout: "main",
+                profileUpdate: true,
+            });
         })
         .catch((err) => {
             console.log("error in POST/editprofile", err);

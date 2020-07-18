@@ -16,7 +16,7 @@
     <input name="pwd" type="password">
     <label>Your Brand New Password</label>
     <br>
-    <input name="age" type="number" {{#if number}} value="{{number}}" {{/if}}>
+    <input name="age" type="number" {{#if age}} value="{{age}}" {{/if}}>
     <label>Your Age</label>
     <br>
     <input name="city" type="text" {{#if city}} value="{{city}}" {{/if}}>
@@ -26,5 +26,12 @@
     <label>Your Homepage</label>
     <br>
     <button type="submit" id="signup">Date-me-up!</button>
+    <br>
+
     {{/info}}
+
 </form>
+
+{{#if profileUpdate}}
+<h3>Thank you for updating your profile!</h3>
+{{/if}}
