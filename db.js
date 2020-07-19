@@ -32,7 +32,9 @@ module.exports.logProfiles = (age, city, homepage, user_id) => {
 };
 
 module.exports.getPwd = function (email) {
-    let q = "SELECT pwd, id FROM users WHERE email = ($1)";
+    let q =
+        "SELECT users.first, users.pwd, users.id, signatures.id AS sigid FROM users JOIN signatures ON users.id = signatures.user_id WHERE users.email = $1";
+
     let params = [email];
     return db.query(q, params);
 };

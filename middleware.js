@@ -19,25 +19,41 @@
 //    }
 //});
 
-module.exports.requireLoggedOutUser = function requireLoggedOutUser(req, res, next) {
-    //is the user logged in?
-    if (req.session.hasUesrId) {
-        res.redirect('/petition');
+module.exports.requireSignedUser = function requireSignedUser(req, res, next) {
+    //is the user signed in?
+    if (!req.session.hasUserId || !req.session.user_Id) {
+        res.redirect("/reg");
     } else {
-        //runs if the user is NOT logged in!
-        //don't redirect the user, allow him to enter reg/login
         next();
     }
-}
+};
 
-module.exports.requireNoSignature = function requireNoSignature(req, res, next) {
+module.exports.requireHasSig = function requireHasSig(req, res, next) {
     //has the user signed the petition?
-    if (req.session.hasSigId) {
+    if (req.session.sigId) {
         res.redirect("/thankyou");
     } else {
         next();
     }
-}
+};
+
+module.exports.requireNoSig = function requireNoSig(req, res, next) {
+    //has the user signed the petition?
+    if (!req.session.sigId) {
+        res.redirect("/petition");
+    } else {
+        next();
+    }
+};
+
+module.exports.requireLoggedIn = function requireLoggedIn(req, res, next) {
+    //has the user signed the petition?
+    if (req.session == null) {
+        res.redirect("/");
+    } else {
+        next();
+    }
+};
 
 //checking if user is NOT logged in:
 //using req.session !=null?

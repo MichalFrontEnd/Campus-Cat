@@ -4,7 +4,12 @@ const cookieSession = require("cookie-session");
 const { hash, compare } = require("./bc");
 const hb = require("express-handlebars");
 const db = require("./db");
-const { requireLoggedOutUser, requireNoSignature } = require("./middleware");
+const {
+    requireSignedUser,
+    requireHasSig,
+    requireNoSig,
+    requireLoggedIn,
+} = require("./middleware");
 const csurf = require("csurf");
 
 //const { body, validationResult, sanitizeBody } = require("express-validator");
@@ -38,35 +43,29 @@ let email;
 let userPwd;
 let user_id;
 
-app.get("/", (req, res) => {
-    res.redirect("/reg");
+app.get("/", requireLoggedIn, requireSignedUser, requireHasSig, (req, res) => {
+    console.log(
+        "nothing to actually do here, since the middleware takes care of the redirection"
+    );
 });
 
-app.get("/reg", requireLoggedOutUser, (req, res) => {
-    //if users have a signature or a user_id stored they are redirected to see their signature. Maybe can get rid.
-    if (req.session.hasSigId === true || req.session.hasUserId === true) {
-        res.redirect("/thankyou");
-    } else {
-        res.render("reg", {
-            layout: "main",
+app.get("/reg", requireHasSig, (req, res) => {
+    res.render("reg", {
+        layout: "main",
+    });
+    //gets info from the users db
+    db.getCreds()
+        .then((results) => {
+            //console.log("getCreds results: ", results);
+        })
+        .catch((err) => {
+            console.log("err in GET /reg getting creds: ", err);
         });
-        //gets info from the users db
-        db.getCreds()
-            .then((results) => {
-                //console.log("getCreds results: ", results);
-            })
-            .catch((err) => {
-                console.log("err in GET /reg getting creds: ", err);
-            });
-    }
 });
 
-app.post("/reg", (req, res) => {
-    //console.log('req.body: ', req.body);
-
+app.post("/reg", requireHasSig, (req, res) => {
     hash(req.body.pwd)
         .then((hashedPwd) => {
-            //console.log('hashed user Pwd: ', hashedPwd);
             db.logCreds(
                 req.body.first,
                 req.body.last,
@@ -74,13 +73,11 @@ app.post("/reg", (req, res) => {
                 hashedPwd
             )
                 .then((results) => {
-                    //console.log('logCred results: ', results);
-
                     //storing the user_id and name in the cookie:
                     req.session.user_id = results.rows[0].id;
                     req.session.hasUserId = true;
                     req.session.first = first;
-                    req.session.last = last;
+                    //req.session.last = last;
 
                     res.redirect("/newprofile");
                 })
@@ -108,8 +105,6 @@ app.get("/newprofile", (req, res) => {
 });
 
 app.post("/newprofile", (req, res) => {
-    //console.log('req.body in /newprofile: ', req.body);
-
     if (req.body.age || req.body.city || req.body.homepage) {
         if (!req.body.homepage) {
             req.body.hompage = "";
@@ -144,6 +139,7 @@ app.get("/login", (req, res) => {
         layout: "main",
     });
     //getting the credentials from the db Do I need this?
+
     db.getCreds()
         .then((results) => {
             //console.log("getCreds results: ", results);
@@ -155,26 +151,27 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
     //getting the hashed pwd from the db using the email.
-    if (req.body.email) {
-        db.getPwd(req.body.email)
-            .then((results) => {
-                //if (!results.rows[0].pwd) {
-                //    res.render("login", {
-                //        layout: "main",
-                //        error: true,
-                //    })
-                //} else {
+
+    //if (req.body.email) {
+    //console.log("req.body.email: ", req.body.email);
+    db.getPwd(req.body.email)
+        .then((results) => {
+            console.log("results in getPwd: ", results);
+            if (!results.rows[0].pwd) {
+                res.render("login", {
+                    layout: "main",
+                    error: true,
+                });
+            } else {
                 //comparing the user input pwd and the hashed pwd
                 compare(req.body.pwd, results.rows[0].pwd)
                     .then((matchValue) => {
-                        //console.log('matchValue: ', matchValue);
                         if (matchValue === true) {
-                            req.session.hasUesrId = true;
-                            req.session.email = req.body.email;
-                            //req.session.user_id = results.rows[0].id;
-                            req.session.loggedIn = true;
-                            //console.log('req.session after login credcomparison: ', req.session);
-                            res.redirect("/petition");
+                            //req.session.email = req.body.email;
+                            req.session.first = results.rows[0].first;
+                            req.session.user_id = results.rows[0].id;
+                            req.session.sigId = results.rows[0].sigid;
+                            res.redirect("/thankyou");
                         } else {
                             res.render("login", {
                                 layout: "main",
@@ -189,48 +186,42 @@ app.post("/login", (req, res) => {
                             error: true,
                         });
                     });
-                //}
-            })
-            .catch((err) => {
-                console.log("err in Post /login getting creds: ", err);
-                res.render("login", {
-                    layout: "main",
-                    error: true,
-                });
+            }
+        })
+        .catch((err) => {
+            console.log("err in Post /login getting creds: ", err);
+            res.render("login", {
+                layout: "main",
+                error: true,
             });
-    } else {
-        res.render("login", {
-            layout: "main",
-            error: true,
         });
-    }
+    //} else {
+    //    res.render("login", {
+    //        layout: "main",
+    //        error: true,
+    //    });
+    //}
 });
 
-app.get("/petition", (req, res) => {
-    //checks cookies if signed petition
-    if (req.session.hasSigId) {
-        res.redirect("/thankyou");
-    } else {
-        res.render("petition", {
-            layout: "main",
-        });
-        //selects all info from signature db. Is this needed?
+app.get("/petition", requireSignedUser, requireHasSig, (req, res) => {
+    res.render("petition", {
+        layout: "main",
+    });
+    //selects all info from signature db. Is this needed?
 
-        db.getSignatures()
-            .then((results) => {
-                //console.log("getSignature results: ", results);
-            })
-            .catch((err) => {
-                console.log("err in GET /petition: ", err);
-            });
-    }
+    //db.getSignatures()
+    //    .then((results) => {
+    //        //console.log("getSignature results: ", results);
+    //    })
+    //    .catch((err) => {
+    //        console.log("err in GET /petition: ", err);
+    //    });
 });
 
-app.post("/petition", (req, res) => {
+app.post("/petition", requireSignedUser, requireHasSig, (req, res) => {
     db.addSignatures(req.session.user_id, req.body.signature)
         .then((results) => {
             //storing the signature id in the cookie
-            req.session.hasSigId = true;
             req.session.sigId = results.rows[0].id;
             res.redirect("/thankyou");
             //console.log('req.session after addSignatures: ', req.session);
@@ -244,10 +235,14 @@ app.post("/petition", (req, res) => {
         });
 });
 
-app.get("/thankyou", (req, res) => {
-    db.sigNumber()
-        .then((results) => {
-            if (req.session.hasSigId) {
+app.get(
+    "/thankyou",
+    //requireSignedUser,
+    requireNoSig,
+    //requireLoggedIn,
+    (req, res) => {
+        db.sigNumber()
+            .then((results) => {
                 signers = results.rows[0].count;
                 db.getSigUrl(req.session.user_id)
                     .then((results) => {
@@ -262,19 +257,18 @@ app.get("/thankyou", (req, res) => {
                     .catch((err) => {
                         console.log("err in GET /thankyou getSigUrl: ", err);
                     });
-            } else {
-                res.redirect("/petition");
-            }
-        })
-        .catch((err) => {
-            console.log("err in GET /thankyou get sigNumber: ", err);
-        });
-});
+            })
+            .catch((err) => {
+                console.log("err in GET /thankyou get sigNumber: ", err);
+            });
+    }
+);
 
-app.post("/thankyou", (req, res) => {
+app.post("/thankyou", requireNoSig, (req, res) => {
     db.deleteSig(req.session.user_id)
         .then((results) => {
             req.session.hasSigId = false;
+            req.session.sigId = "";
             res.redirect("/petition");
         })
         .catch((err) => {
@@ -282,7 +276,7 @@ app.post("/thankyou", (req, res) => {
         });
 });
 
-app.get("/signers", (req, res) => {
+app.get("/signers", requireSignedUser, (req, res) => {
     db.getNames()
         .then((results) => {
             res.render("signers", {
@@ -296,7 +290,7 @@ app.get("/signers", (req, res) => {
         });
 });
 
-app.get("/signers/:city", (req, res) => {
+app.get("/signers/:city", requireSignedUser, (req, res) => {
     db.getCity(req.params.city).then((results) => {
         res.render("signers", {
             layout: "main",
@@ -305,10 +299,9 @@ app.get("/signers/:city", (req, res) => {
     });
 });
 
-app.get("/editprofile", (req, res) => {
+app.get("/editprofile", requireSignedUser, (req, res) => {
     db.getInfo(req.session.user_id)
         .then((results) => {
-            console.log("password in editprofile", results.rows[0].pwd);
             res.render("editprofile", {
                 layout: "main",
                 info: results.rows,
@@ -319,18 +312,12 @@ app.get("/editprofile", (req, res) => {
         });
 });
 
-app.post("/editprofile", (req, res) => {
+app.post("/editprofile", requireSignedUser, (req, res) => {
     if (req.body.pwd) {
-        console.log("req.body.pwd: ", req.body.pwd);
         hash(req.body.pwd).then((hashedPwd) => {
-            console.log("hashedPwd: ", hashedPwd);
             db.updatePassword(req.session.user_id, hashedPwd)
                 .then((results) => {
-                    //res.render("editprofile", {
-                    //    layout: "main",
-                    //    profileUpdate: true,
-                    //});
-                    //res.redirect("/editprofile");
+                    console.log("Password changed successfuly");
                 })
                 .catch((err) => {
                     console.log("error in updatePassword", err);
