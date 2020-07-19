@@ -12,6 +12,7 @@
     </label>
     <input id="signature" name="signature" type="hidden">
     <canvas id="canvas" width="400" height="80" style="background-color: white; border: 2px dashed red;"></canvas>
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <button type="submit" id="submit">Submit!</button>
     <button id="clear">Clear</button>
     <input name="_csrf" value="{{csrfToken}}" type="hidden">

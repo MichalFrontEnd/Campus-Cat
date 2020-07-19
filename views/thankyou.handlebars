@@ -4,9 +4,8 @@
 <br>
 <img src="{{dataUrl}}">
 
-<form method="POST">
-    <input type="hidden">
-    {{!--name="_csrf" value="{{csrfToken}}">--}}
+<form action="/thankyou" method="POST">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <button id="deleteSig">🗑</button>
 </form>
 

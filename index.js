@@ -5,10 +5,12 @@ const { hash, compare } = require("./bc");
 const hb = require("express-handlebars");
 const db = require("./db");
 const { requireLoggedOutUser, requireNoSignature } = require("./middleware");
+const csurf = require("csurf");
 
 //const { body, validationResult, sanitizeBody } = require("express-validator");
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
+
 app.use(
     cookieSession({
         secret: `Cats are the best.`,
@@ -20,6 +22,14 @@ app.use(express.static("./public"));
 //app.use(express.static("./"));
 
 app.use(express.urlencoded({ extended: false }));
+
+app.use(csurf());
+
+app.use(function (req, res, next) {
+    res.setHeader("x-frame-options", "deny");
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 let signers;
 let first;
@@ -110,7 +120,6 @@ app.post("/newprofile", (req, res) => {
         ) {
             req.body.homepage = "http://" + req.body.homepage;
         }
-        req.session.homepage = req.body.homepage;
 
         db.logProfiles(
             [req.body.age],
@@ -328,7 +337,15 @@ app.post("/editprofile", (req, res) => {
                 });
         });
     }
-
+    if (!req.body.homepage) {
+        req.body.hompage = "";
+    } else if (
+        !req.body.homepage.startsWith("http://") &&
+        !req.body.homepage.startsWith("https://") &&
+        !req.body.homepage.startsWith("//")
+    ) {
+        req.body.homepage = "http://" + req.body.homepage;
+    }
     Promise.all([
         db.updateInfo(
             req.session.user_id,
@@ -343,7 +360,7 @@ app.post("/editprofile", (req, res) => {
             req.body.homepage
         ),
     ])
-        .then((results) => {
+        .then(() => {
             profileUpdate = true;
             if (req.body.first) {
                 req.session.first = req.body.first;
