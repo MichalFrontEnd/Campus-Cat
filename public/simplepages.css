@@ -1,0 +1,85 @@
+#catbook {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+#lovecats {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+#catwitheyes {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 80%;
+    background-color: transparent;
+}
+
+#whitecat {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+#happykitty {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+#playful {
+    position: absolute;
+    right: 12%;
+    bottom: 0;
+    height: 82%;
+    background-color: transparent;
+    z-index: 0;
+}
+
+#signup {
+    /*margin-left: 5%;*/
+    z-index: 5;
+}
+
+.eph,
+.npcontainer {
+    margin-left: 0.5%;
+}
+
+.npcontainer {
+    height: 50%;
+    width: 20%;
+    text-align: center;
+}
+
+.npcontainer p,
+.npcontainer,
+#signup,
+.profile,
+form,
+input,
+label {
+    z-index: 10;
+}
+
+.profile {
+    margin-top: 10%;
+    display: flex;
+    flex-direction: column;
+    font-size: 1.1em;
+    text-align: center;
+    align-items: center;
+    height: 100%;
+}
+
+.profile input {
+    margin-bottom: 7%;
+    margin-top: 1%;
+}
+
+.profile button {
+    margin-top: 15%;
+}

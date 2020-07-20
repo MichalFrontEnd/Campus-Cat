@@ -1,38 +1,41 @@
 {{!-- Edit Profile --}}
 
-<h1>Edit Your Profile</h1>
+<h1 class="eph">Edit Your Profile</h1>
+<div class="npcontainer">
 
-<form method="POST">
-    {{#info}}
-    <input name="first" type="text" value="{{first}}">
-    <label>Your Name</label>
-    <br>
-    <input name="last" type="text" value="{{last}}">
-    <label>Your Last Name</label>
-    <br>
-    <input name="email" type="text" value="{{email}}">
-    <label>Your Email Address</label>
-    <br>
-    <input name="pwd" type="password">
-    <label>Your Brand New Password</label>
-    <br>
-    <input name="age" type="number" {{#if age}} value="{{age}}" {{/if}}>
-    <label>Your Age</label>
-    <br>
-    <input name="city" type="text" {{#if city}} value="{{city}}" {{/if}}>
-    <label>Your City</label>
-    <br>
-    <input name="homepage" type="text" {{#if homepage}} value="{{homepage}}" {{/if}}>
-    <label>Your Homepage</label>
-    <br>
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    <button type="submit" id="signup">Date-me-up!</button>
-    <br>
+    <form class="profile" method="POST">
 
-    {{/info}}
+        {{#info}}
+        <label>Your Name</label>
+        <input name="first" type="text" value="{{first}}">
 
-</form>
+        <label>Your Last Name</label>
+        <input name="last" type="text" value="{{last}}">
 
+        <label>Your Email Address</label>
+        <input name="email" type="text" value="{{email}}">
+
+        <label>Your Brand New Password</label>
+        <input name="pwd" type="password">
+
+        <label>Your Age</label>
+        <input name="age" type="number" {{#if age}} value="{{age}}" {{/if}}>
+
+        <label>Your City</label>
+        <input name="city" type="text" {{#if city}} value="{{city}}" {{/if}}>
+
+        <label>Your Homepage</label>
+        <input name="homepage" type="text" {{#if homepage}} value="{{homepage}}" {{/if}}>
+
+
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <button type="submit" id="signup">Date-me-up!</button>
+        {{/info}}
+
+    </form>
+</div>
+<img id="whitecat" alt="white cat with blue and green eyes" src="10.png">
 {{#if profileUpdate}}
 <h3>Thank you for updating your profile!</h3>
+<img src="11.png" alt="very happy cat" id="happykitty">
 {{/if}}

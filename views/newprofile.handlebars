@@ -1,17 +1,16 @@
-<h3>We want to get to know you better:
-</h3>
-<form method="POST">
-    <input name="age" type="number">
-    <label>Your Age</label>
-    <br>
-    <input name="city" type="text">
-    <label>Your City</label>
-    <br>
-    <input name="homepage" type="text">
-    <label>Your Homepage</label>
-    <br>
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    <button type="submit" id="signup">Continue</button>
-    <br>
-    <p>Or you can <a href="/petition">skip</a> to the next page.</p>
-</form>
+<h2>We want to get to know you better:
+</h2>
+<div class="npcontainer">
+    <form class="profile" method="POST">
+        <label>Your Age</label>
+        <input name="age" type="number">
+        <label>Your City</label>
+        <input name="city" type="text">
+        <label>Your Homepage</label>
+        <input name="homepage" type="text">
+        <button type="submit" id="signup">Continue</button>
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <p>Or you can <a href="/petition">skip</a> to the next page.</p>
+    </form>
+</div>
+<img id="playful" alt="playful maine coon kitten" src="9.png"

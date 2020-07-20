@@ -6,7 +6,7 @@ section.topsection {
 
 .thanks {
     font-size: 36px;
-    margin-left: 0.5%;
+    /*margin-left: 0.5%;*/
 }
 
 .userSig {
@@ -25,13 +25,6 @@ section.topsection {
     font-size: 3em;
 }
 
-/*.pagebody {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-
-    grid-template-rows: repeat(4, 150px);
-}*/
-
 #tyjumbo {
     grid-area: 1 / 1 / span 4 / span 12;
     background-image: url(SpicedLoungeHDR.jpg);
@@ -44,7 +37,7 @@ section.topsection {
 .cz {
     grid-area: 5 / 1 / span 4 / span 12;
     font-size: 24px;
-    margin-left: 0.5%;
+    /*margin-left: 0.5%;*/
 }
 
 .signerslink {

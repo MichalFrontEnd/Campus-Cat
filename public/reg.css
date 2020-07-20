@@ -41,6 +41,8 @@ span,
 label,
 p,
 #show_pet,
+#catpaw,
+footer,
 #hide_pet {
     background-color: transparent;
 }
@@ -56,7 +58,8 @@ p,
     text-align: center;
 }
 
-#show_pet {
+#show_pet,
+#catpaw {
     height: 11%;
     width: 17%;
     display: flex;

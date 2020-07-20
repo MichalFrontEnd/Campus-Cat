@@ -50,6 +50,12 @@ app.get("/", (req, res) => {
     res.redirect("/reg");
 });
 
+app.get("/home", (req, res) => {
+    res.render("home", {
+        layout: "main",
+    });
+});
+
 app.get("/reg", (req, res) => {
     res.render("reg", {
         layout: "main",

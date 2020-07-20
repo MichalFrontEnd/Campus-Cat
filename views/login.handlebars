@@ -1,7 +1,7 @@
 {{!--login--}}
 {{!--Error handling--}}
 {{#if error}}
-<h3>incorrect username or password</h3>
+<p class="error">incorrect username or password</p class="error">
 {{/if}}
 
 {{!--<img>--}}
@@ -10,14 +10,22 @@
     Please log in:
 </h3>
 <form method="POST">
-    <input name="email" type="text">
-    <label>Your Email Address</label>
-    <br>
-    <input name="pwd" type="password">
-    <label>Your Password</label>
+    <table>
+        <tr>
+            <td><label>Your Email Address</label></td>
+            <td><input name="email" type="text"></td>
+        </tr>
+        <tr>
+            <td><label>Your Password</label></td>
+            <td><input name="pwd" type="password"></td>
+        </tr>
+
+    </table>
     <br>
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    <button type="submit" id="signup">Log in</button>
+    <button type="submit" id="signup">Meow in</button>
     <br>
 </form>
-<p>Not a member yet? please <a href="/reg">sign up</a> here.</p>
+<p>Not a member yet? please <a href="/reg">meow up</a> here.</p>
+
+<img id="catwitheyes" alt="maine coon cat with big eyes" src="6.png"

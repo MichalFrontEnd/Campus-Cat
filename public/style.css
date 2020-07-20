@@ -4,12 +4,17 @@
     /*font-size: 1.1em;*/
 }
 
-body {
-    position: relative;
+html {
     height: 100vh;
-    /*display: grid;*/
+    position: relative;
+    overflow-x: hidden;
+}
+
+body {
+    width: 100vw;
     margin: 0;
-    /*background-color: indigo;*/
+    height: 100%;
+    margin-left: 0.5%;
 }
 
 a,
@@ -52,7 +57,12 @@ navbar ul li {
     top: 1%;
 }
 
+.error {
+    color: orangered;
+    font-size: 1.3em;
+}
+
 footer {
-    position: sticky;
+    position: absolute;
     bottom: 0;
 }
