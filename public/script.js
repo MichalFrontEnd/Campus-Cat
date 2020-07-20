@@ -19,6 +19,7 @@ let userX;
 let userY;
 let offsetX = canvas.offset().left;
 let offsetY = canvas.offset().top;
+
 let mousePos = { x: 0, y: 0 };
 let lastPos = mousePos;
 
@@ -45,7 +46,7 @@ canvas.on("mouseup", (e) => {
     drawing = false;
     dataUrl = canvas[0].toDataURL("image/png", 0.1);
 
-    //console.log("dataUrl: ", dataUrl);
+    console.log("dataUrl: ", dataUrl);
 });
 
 clear.on("click", (e) => {

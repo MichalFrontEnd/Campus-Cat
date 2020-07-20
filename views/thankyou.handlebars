@@ -1,16 +1,24 @@
 {{!--thankyou--}}
+<h1 class="thanks">{{thanks}}</h1>
+<section class="topsection">
 
-<h1>{{thanks}}</h1>
-<br>
-<img src="{{dataUrl}}">
+    <img src="{{dataUrl}}" class="userSig">
+    <div class="deletesig">
+        <form action="/thankyou" method="POST">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <button id="deleteSig">🗑</button>
+        </form>
+    </div>
+</section>
 
-<form action="/thankyou" method="POST">
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    <button id="deleteSig">🗑</button>
-</form>
+<section class="pagebody">
+    <div class="jumbotron" id="tyjumbo">
+    </div>
+    <p class="cz">Thanks to you, we're one step closer to having the Comfort Zone look like this!</p>
 
-<a href="/signers">
-    <h3>
-        {{signatures}}
-    </h3>
-</a>
+    <a class="signerslink" href="/signers">
+        <h3>
+            {{signatures}}
+        </h3>
+    </a>
+</section>

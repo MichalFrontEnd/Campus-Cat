@@ -78,7 +78,6 @@ app.post("/reg", (req, res) => {
                     req.session.user_id = results.rows[0].id;
                     req.session.hasUserId = true;
                     req.session.first = first;
-                    //req.session.last = last;
 
                     res.redirect("/newprofile");
                 })
@@ -211,15 +210,6 @@ app.get(
         res.render("petition", {
             layout: "main",
         });
-        //selects all info from signature db. Is this needed?
-
-        //db.getSignatures()
-        //    .then((results) => {
-        //        //console.log("getSignature results: ", results);
-        //    })
-        //    .catch((err) => {
-        //        console.log("err in GET /petition: ", err);
-        //    });
     }
 );
 
@@ -230,6 +220,10 @@ app.post(
         db.addSignatures(req.session.user_id, req.body.signature)
             .then((results) => {
                 //storing the signature id in the cookie
+                console.log(
+                    //"results.rowsin addSig to see why noSig redirects to TY: ",
+                    results.rows
+                );
                 req.session.sigId = results.rows[0].id;
                 res.redirect("/thankyou");
                 //console.log('req.session after addSignatures: ', req.session);
@@ -258,8 +252,8 @@ app.get(
                         //console.log("results in getSigUrl: ", results);
                         res.render("thankyou", {
                             layout: "main",
-                            thanks: `Thank you ${req.session.first}, for signing the petition!`,
-                            signatures: `check out all ${signers} signatures!`,
+                            thanks: `Thank you ${req.session.first}, for your paw-print!`,
+                            signatures: `check out our purrrrfect ${signers} supporters!`,
                             dataUrl: `${results.rows[0].signature}`,
                         });
                     })
@@ -330,7 +324,7 @@ app.post("/editprofile", (req, res) => {
         hash(req.body.pwd).then((hashedPwd) => {
             db.updatePassword(req.session.user_id, hashedPwd)
                 .then((results) => {
-                    console.log("Password changed successfuly");
+                    //console.log("Password changed successfuly");
                 })
                 .catch((err) => {
                     console.log("error in updatePassword", err);
