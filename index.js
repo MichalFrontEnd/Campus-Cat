@@ -43,13 +43,13 @@ let email;
 let userPwd;
 let user_id;
 
-app.get("/", requireLoggedIn, requireSignedUser, requireHasSig, (req, res) => {
+app.get("/", (req, res) => {
     console.log(
         "nothing to actually do here, since the middleware takes care of the redirection"
     );
 });
 
-app.get("/reg", requireHasSig, (req, res) => {
+app.get("/reg", (req, res) => {
     res.render("reg", {
         layout: "main",
     });
@@ -63,7 +63,7 @@ app.get("/reg", requireHasSig, (req, res) => {
         });
 });
 
-app.post("/reg", requireHasSig, (req, res) => {
+app.post("/reg", (req, res) => {
     hash(req.body.pwd)
         .then((hashedPwd) => {
             db.logCreds(
@@ -276,7 +276,7 @@ app.post("/thankyou", requireNoSig, (req, res) => {
         });
 });
 
-app.get("/signers", requireSignedUser, (req, res) => {
+app.get("/signers", (req, res) => {
     db.getNames()
         .then((results) => {
             res.render("signers", {
@@ -290,7 +290,7 @@ app.get("/signers", requireSignedUser, (req, res) => {
         });
 });
 
-app.get("/signers/:city", requireSignedUser, (req, res) => {
+app.get("/signers/:city", (req, res) => {
     db.getCity(req.params.city).then((results) => {
         res.render("signers", {
             layout: "main",
@@ -299,7 +299,7 @@ app.get("/signers/:city", requireSignedUser, (req, res) => {
     });
 });
 
-app.get("/editprofile", requireSignedUser, (req, res) => {
+app.get("/editprofile", (req, res) => {
     db.getInfo(req.session.user_id)
         .then((results) => {
             res.render("editprofile", {
@@ -312,7 +312,7 @@ app.get("/editprofile", requireSignedUser, (req, res) => {
         });
 });
 
-app.post("/editprofile", requireSignedUser, (req, res) => {
+app.post("/editprofile", (req, res) => {
     if (req.body.pwd) {
         hash(req.body.pwd).then((hashedPwd) => {
             db.updatePassword(req.session.user_id, hashedPwd)

@@ -1,5 +1,6 @@
   
 -- psql caper-petition -f  sql/signatures.sql
+--sudo service postgresql start
 --
 DROP TABLE IF EXISTS users CASCADE;
 

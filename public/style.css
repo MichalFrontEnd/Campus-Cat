@@ -1,3 +1,57 @@
 * {
-    background-color: lemonchiffon;
+    background-color: lightgray;
+    font-family: "Itim", cursive;
+}
+
+body {
+    position: relative;
+    height: 100vh;
+    display: grid;
+    margin: 0;
+    /*background-color: indigo;*/
+}
+
+a,
+a:active {
+    background-color: transparent;
+    color: midnightblue;
+}
+
+navbar {
+    width: 100%;
+    border-bottom: 2px solid black;
+    display: inline-flex;
+    height: 55px;
+    justify-content: flex-end;
+}
+
+navbar ul {
+    display: flex;
+    width: 45%;
+    justify-content: space-between;
+    list-style-type: none;
+    padding-right: 2%;
+}
+
+navbar ul a {
+    text-decoration: none;
+    font-size: 1.1em;
+    /*font-family: "Shadows Into Light", cursive;*/
+}
+
+/*
+navbar ul li {
+
+}*/
+
+.home {
+    height: 2.5rem;
+    position: absolute;
+    left: 1%;
+    top: 1%;
+}
+
+footer {
+    position: sticky;
+    bottom: 0;
 }

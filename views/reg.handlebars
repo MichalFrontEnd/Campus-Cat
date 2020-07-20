@@ -6,25 +6,45 @@
 {{/if}}
 {{!--<img>--}}
 
+<section class="regbody">
+    {{!--<h1>Bla bla support the cause</h1>--}}
+    {{!----}}
 
-<h1>Bla bla support the cause</h1>
+    <div class="jumbotron"></div>
+    <img src="CampusCat.jpg" alt="kitty holding a sign" class="kittysign">
+    <section class="sidebar">
+        <p class="intro"><span>Cats make us happy.</span><br>
+            They support us when we're sad or stressed and their purring has a calming effect.
+            Every Campus should have a cat, for the wellbeing of the students.<br> We here at Spiced should set
+            an example.
+            <br><br>
+            Agree?
+            <br>
+            High-five the paw here to sign the petition:
+            <br>
+        </p>
+        <img id="show_pet" src="Catpaw.png">
+        <p id="ar_mem">Already a member? <br>please <a href="/login">meow-in</a>.</p>
 
-<form method="POST">
+    </section>
+    </div>
+    {{!--<form id="reg_form" method="POST">
 
-    <input name="first" type="text">
-    <label>Your Name</label>
-    <br>
-    <input name="last" type="text">
-    <label>Your Last Name</label>
-    <br>
-    <input name="email" type="text">
-    <label>Your Email Address</label>
-    <br>
-    <input name="pwd" type="password">
-    <label>Your Brand New Password</label>
-    <br>
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    <button type="submit" id="signup">Sign up!</button>
-    <br>
-</form>
-<p>Already a member? please <a href="/login">log in</a>.</p>
+        <input name="first" type="text">
+        <label>Your Name</label>
+        <br>
+        <input name="last" type="text">
+        <label>Your Last Name</label>
+        <br>
+        <input name="email" type="text">
+        <label>Your Email Address</label>
+        <br>
+        <input name="pwd" type="password">
+        <label>Your Brand New Password</label>
+        <br>
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <button type="submit" id="signup">Sign up!</button>
+        <br>
+    </form>--}}
+
+</section>
