@@ -45,10 +45,16 @@
 }
 
 .eph,
-.npcontainer {
+.npcontainer,
+#supports,
+#suph {
     margin-left: 0.5%;
 }
 
+#supporters {
+    font-size: 1.2em;
+    letter-spacing: 0.1em;
+}
 .npcontainer {
     height: 50%;
     width: 20%;
