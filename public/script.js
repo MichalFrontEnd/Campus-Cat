@@ -6,8 +6,6 @@ const ctx = canvas[0].getContext("2d");
 const submit = $("#submit");
 const clear = $("#clear");
 
-const showPet = $("#show_pet");
-const regForm = $("#reg");
 ////I want to have an event handler that makes all buttons work with "enter"
 
 //const button = $("button");
@@ -23,10 +21,6 @@ let offsetX = canvas.offset().left;
 let offsetY = canvas.offset().top;
 let mousePos = { x: 0, y: 0 };
 let lastPos = mousePos;
-
-showPet.on("click", (e) => {
-    console.log("showPet button clicked");
-});
 
 canvas.on("mousedown", (e) => {
     //console.log("mouse clicked on canvas!");

@@ -20,7 +20,7 @@
             <br><br>
             Agree?
             <br>
-            High-five the paw here to sign the petition:
+            High-five the paw to sign the petition:
             <br>
         </p>
         <img id="show_pet" src="Catpaw.png">
@@ -28,23 +28,27 @@
 
     </section>
     </div>
-    {{!--<form id="reg_form" method="POST">
-
-        <input name="first" type="text">
+    <form class="reg_form" method="POST">
+        <img id="hide_pet" src="Catpaw.png">
+        <span>Cats make us happy.</span>
         <label>Your Name</label>
-        <br>
-        <input name="last" type="text">
+        <input name="first" type="text">
+
         <label>Your Last Name</label>
-        <br>
-        <input name="email" type="text">
+        <input name="last" type="text">
+
         <label>Your Email Address</label>
-        <br>
+        <input name="email" type="text">
+
+        <label>Your New Password</label>
         <input name="pwd" type="password">
-        <label>Your Brand New Password</label>
-        <br>
+
+
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
-        <button type="submit" id="signup">Sign up!</button>
-        <br>
-    </form>--}}
+        <button type="submit" id="signup">Sign meowe up!</button>
+
+    </form>
 
 </section>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="/reg.js"></script>

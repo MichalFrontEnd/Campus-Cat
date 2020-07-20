@@ -4,12 +4,12 @@ const cookieSession = require("cookie-session");
 const { hash, compare } = require("./bc");
 const hb = require("express-handlebars");
 const db = require("./db");
-const {
-    requireSignedUser,
-    requireHasSig,
-    requireNoSig,
-    requireLoggedIn,
-} = require("./middleware");
+//const {
+//    requireSignedUser,
+//    requireHasSig,
+//    requireNoSig,
+//    requireLoggedIn,
+//} = require("./middleware");
 const csurf = require("csurf");
 
 //const { body, validationResult, sanitizeBody } = require("express-validator");
@@ -47,6 +47,7 @@ app.get("/", (req, res) => {
     console.log(
         "nothing to actually do here, since the middleware takes care of the redirection"
     );
+    res.redirect("/reg");
 });
 
 app.get("/reg", (req, res) => {
@@ -203,42 +204,50 @@ app.post("/login", (req, res) => {
     //}
 });
 
-app.get("/petition", requireSignedUser, requireHasSig, (req, res) => {
-    res.render("petition", {
-        layout: "main",
-    });
-    //selects all info from signature db. Is this needed?
-
-    //db.getSignatures()
-    //    .then((results) => {
-    //        //console.log("getSignature results: ", results);
-    //    })
-    //    .catch((err) => {
-    //        console.log("err in GET /petition: ", err);
-    //    });
-});
-
-app.post("/petition", requireSignedUser, requireHasSig, (req, res) => {
-    db.addSignatures(req.session.user_id, req.body.signature)
-        .then((results) => {
-            //storing the signature id in the cookie
-            req.session.sigId = results.rows[0].id;
-            res.redirect("/thankyou");
-            //console.log('req.session after addSignatures: ', req.session);
-        })
-        .catch((err) => {
-            console.log("err in POST /petition: ", err);
-            res.render("petition", {
-                layout: "main",
-                error: true,
-            });
+app.get(
+    "/petition",
+    //requireSignedUser, requireHasSig,
+    (req, res) => {
+        res.render("petition", {
+            layout: "main",
         });
-});
+        //selects all info from signature db. Is this needed?
+
+        //db.getSignatures()
+        //    .then((results) => {
+        //        //console.log("getSignature results: ", results);
+        //    })
+        //    .catch((err) => {
+        //        console.log("err in GET /petition: ", err);
+        //    });
+    }
+);
+
+app.post(
+    "/petition",
+    //requireSignedUser, requireHasSig,
+    (req, res) => {
+        db.addSignatures(req.session.user_id, req.body.signature)
+            .then((results) => {
+                //storing the signature id in the cookie
+                req.session.sigId = results.rows[0].id;
+                res.redirect("/thankyou");
+                //console.log('req.session after addSignatures: ', req.session);
+            })
+            .catch((err) => {
+                console.log("err in POST /petition: ", err);
+                res.render("petition", {
+                    layout: "main",
+                    error: true,
+                });
+            });
+    }
+);
 
 app.get(
     "/thankyou",
     //requireSignedUser,
-    requireNoSig,
+    //requireNoSig,
     //requireLoggedIn,
     (req, res) => {
         db.sigNumber()
@@ -264,17 +273,21 @@ app.get(
     }
 );
 
-app.post("/thankyou", requireNoSig, (req, res) => {
-    db.deleteSig(req.session.user_id)
-        .then((results) => {
-            req.session.hasSigId = false;
-            req.session.sigId = "";
-            res.redirect("/petition");
-        })
-        .catch((err) => {
-            console.log("error in deleteSig", err);
-        });
-});
+app.post(
+    "/thankyou",
+    //requireNoSig,
+    (req, res) => {
+        db.deleteSig(req.session.user_id)
+            .then((results) => {
+                req.session.hasSigId = false;
+                req.session.sigId = "";
+                res.redirect("/petition");
+            })
+            .catch((err) => {
+                console.log("error in deleteSig", err);
+            });
+    }
+);
 
 app.get("/signers", (req, res) => {
     db.getNames()
