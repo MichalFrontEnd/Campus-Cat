@@ -60,8 +60,8 @@ footer,
 
 #show_pet,
 #catpaw {
-    height: 11%;
-    width: 17%;
+    height: 60px;
+    width: 70px;
     display: flex;
     align-self: center;
     margin-top: 8%;
