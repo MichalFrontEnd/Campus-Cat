@@ -33,8 +33,8 @@ module.exports.requireHasSig = function requireHasSig(req, res, next) {
     //has the user signed the petition?
     if (req.session.user_id && req.session.sigId) {
         res.redirect("/thankyou");
-    } else if (req.session.user_id && !req.session.sigId) {
-        res.redirect("/petition");
+        //} else if (req.session.user_id && !req.session.sigId) {
+        //    res.redirect("/petition");
     } else {
         next();
     }

@@ -57,13 +57,13 @@ app.get("/home", (req, res) => {
     });
 });
 
-app.get("/reg", requireHasSig, (req, res) => {
+app.get("/reg", requireHasSig, requireNoSig, (req, res) => {
     res.render("reg", {
         layout: "main",
     });
 });
 
-app.post("/reg", requireHasSig, (req, res) => {
+app.post("/reg", requireHasSig, requireNoSig, (req, res) => {
     hash(req.body.pwd)
         .then((hashedPwd) => {
             db.logCreds(
