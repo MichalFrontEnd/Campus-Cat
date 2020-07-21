@@ -26,11 +26,9 @@
 
         <label>Your Homepage</label>
         <input name="homepage" type="text" {{#if homepage}} value="{{homepage}}" {{/if}}>
-
-
-        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <button type="submit" id="signup">Date-me-up!</button>
         {{/info}}
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
     </form>
 </div>
