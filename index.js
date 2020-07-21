@@ -61,14 +61,6 @@ app.get("/reg", (req, res) => {
     res.render("reg", {
         layout: "main",
     });
-    //gets info from the users db
-    db.getCreds()
-        .then((results) => {
-            //console.log("getCreds results: ", results);
-        })
-        .catch((err) => {
-            console.log("err in GET /reg getting creds: ", err);
-        });
 });
 
 app.post("/reg", (req, res) => {
@@ -81,10 +73,15 @@ app.post("/reg", (req, res) => {
                 hashedPwd
             )
                 .then((results) => {
+                    console.log("results in post register: ", results);
+                    console.log(
+                        "req.body.first in post register: ",
+                        req.body.first
+                    );
                     //storing the user_id and name in the cookie:
                     req.session.user_id = results.rows[0].id;
                     req.session.hasUserId = true;
-                    req.session.first = first;
+                    req.session.first = req.body.first;
 
                     res.redirect("/newprofile");
                 })
@@ -258,7 +255,10 @@ app.get("/thankyou", requireHasSig, (req, res) => {
             signers = results.rows[0].count;
             db.getSigUrl(req.session.user_id)
                 .then((results) => {
-                    //console.log("results in getSigUrl: ", results);
+                    console.log(
+                        "req.session.first in getSigUrl: ",
+                        req.session.first
+                    );
                     res.render("thankyou", {
                         layout: "main",
                         thanks: `Thank you ${req.session.first}, for your paw-print!`,

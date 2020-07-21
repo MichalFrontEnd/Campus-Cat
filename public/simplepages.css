@@ -2,12 +2,14 @@
     position: absolute;
     right: 0;
     bottom: 0;
+    height: 80%;
 }
 
 #lovecats {
     position: absolute;
     right: 0;
     bottom: 0;
+    height: 80%;
 }
 
 #catwitheyes {
@@ -22,6 +24,7 @@
     position: absolute;
     right: 0;
     bottom: 0;
+    height: 80%;
 }
 
 #happykitty {
@@ -32,7 +35,7 @@
 
 #playful {
     position: absolute;
-    right: 12%;
+    right: 20%;
     bottom: 0;
     height: 82%;
     background-color: transparent;
@@ -55,6 +58,7 @@
     font-size: 1.2em;
     letter-spacing: 0.1em;
 }
+
 .npcontainer {
     height: 50%;
     width: 20%;
