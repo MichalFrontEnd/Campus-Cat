@@ -222,20 +222,17 @@ app.post("/login", (req, res) => {
 //}
 //});
 
-app.get("/petition", (req, res) => {
+app.get("/petition", requireHasSig, (req, res) => {
     res.render("petition", {
         layout: "main",
     });
 });
 
-app.post("/petition", (req, res) => {
+app.post("/petition", requireHasSig, (req, res) => {
     db.addSignatures(req.session.user_id, req.body.signature)
         .then((results) => {
             //storing the signature id in the cookie
-            console.log(
-                //"results.rowsin addSig to see why noSig redirects to TY: ",
-                results.rows
-            );
+            
             req.session.sigId = results.rows[0].id;
             res.redirect("/thankyou");
             //console.log('req.session after addSignatures: ', req.session);
@@ -255,8 +252,7 @@ app.get("/thankyou", requireHasSig, (req, res) => {
             signers = results.rows[0].count;
             db.getSigUrl(req.session.user_id)
                 .then((results) => {
-                    console.log(
-                        "req.session.first in getSigUrl: ",
+
                         req.session.first
                     );
                     res.render("thankyou", {
