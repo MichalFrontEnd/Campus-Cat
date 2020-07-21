@@ -158,55 +158,55 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
     //getting the hashed pwd from the db using the email.
 
-    //if (req.body.email) {
-    //console.log("req.body.email: ", req.body.email);
-    db.getPwd(req.body.email)
-        .then((results) => {
-            console.log("results in getPwd: ", results);
-            if (!results.rows[0].pwd) {
-                res.render("login", {
-                    layout: "main",
-                    error: true,
-                });
-            } else {
-                //comparing the user input pwd and the hashed pwd
-                compare(req.body.pwd, results.rows[0].pwd)
-                    .then((matchValue) => {
-                        if (matchValue === true) {
-                            //req.session.email = req.body.email;
-                            req.session.first = results.rows[0].first;
-                            req.session.user_id = results.rows[0].id;
-                            req.session.sigId = results.rows[0].sigid;
-                            res.redirect("/thankyou");
-                        } else {
+    if (req.body.email) {
+        //console.log("req.body.email: ", req.body.email);
+        db.getPwd(req.body.email)
+            .then((results) => {
+                console.log("results in getPwd: ", results);
+                if (!results.rows[0].pwd) {
+                    res.render("login", {
+                        layout: "main",
+                        error: true,
+                    });
+                } else {
+                    //comparing the user input pwd and the hashed pwd
+                    compare(req.body.pwd, results.rows[0].pwd)
+                        .then((matchValue) => {
+                            if (matchValue === true) {
+                                //req.session.email = req.body.email;
+                                req.session.first = results.rows[0].first;
+                                req.session.user_id = results.rows[0].id;
+                                req.session.sigId = results.rows[0].sigid;
+                                res.redirect("/thankyou");
+                            } else {
+                                res.render("login", {
+                                    layout: "main",
+                                    error: true,
+                                });
+                            }
+                        })
+                        .catch((err) => {
+                            console.log("error in compare");
                             res.render("login", {
                                 layout: "main",
                                 error: true,
                             });
-                        }
-                    })
-                    .catch((err) => {
-                        console.log("error in compare");
-                        res.render("login", {
-                            layout: "main",
-                            error: true,
                         });
-                    });
-            }
-        })
-        .catch((err) => {
-            console.log("err in Post /login getting creds: ", err);
-            res.render("login", {
-                layout: "main",
-                error: true,
+                }
+            })
+            .catch((err) => {
+                console.log("err in Post /login getting creds: ", err);
+                res.render("login", {
+                    layout: "main",
+                    error: true,
+                });
             });
+    } else {
+        res.render("login", {
+            layout: "main",
+            error: true,
         });
-    //} else {
-    //    res.render("login", {
-    //        layout: "main",
-    //        error: true,
-    //    });
-    //}
+    }
 });
 
 //app.use(function reroute(req, res, next) {
@@ -217,13 +217,13 @@ app.post("/login", (req, res) => {
 //}
 //});
 
-app.get("/petition", requireHasSig, (req, res) => {
+app.get("/petition", requireSignedUser, requireHasSig, (req, res) => {
     res.render("petition", {
         layout: "main",
     });
 });
 
-app.post("/petition", requireHasSig, (req, res) => {
+app.post("/petition", requireSignedUser, requireHasSig, (req, res) => {
     db.addSignatures(req.session.user_id, req.body.signature)
         .then((results) => {
             //storing the signature id in the cookie
@@ -241,7 +241,7 @@ app.post("/petition", requireHasSig, (req, res) => {
         });
 });
 
-app.get("/thankyou", requireNoSig, (req, res) => {
+app.get("/thankyou", requireSignedUser, requireNoSig, (req, res) => {
     db.sigNumber()
         .then((results) => {
             signers = results.rows[0].count;
@@ -263,7 +263,7 @@ app.get("/thankyou", requireNoSig, (req, res) => {
         });
 });
 
-app.post("/thankyou", requireNoSig, (req, res) => {
+app.post("/thankyou", requireSignedUser, requireNoSig, (req, res) => {
     db.deleteSig(req.session.user_id)
         .then((results) => {
             req.session.hasSigId = false;
@@ -275,7 +275,7 @@ app.post("/thankyou", requireNoSig, (req, res) => {
         });
 });
 
-app.get("/signers", requireNoSig, (req, res) => {
+app.get("/signers", requireSignedUser, requireNoSig, (req, res) => {
     db.getNames()
         .then((results) => {
             res.render("signers", {
@@ -289,7 +289,7 @@ app.get("/signers", requireNoSig, (req, res) => {
         });
 });
 
-app.get("/signers/:city", requireNoSig, (req, res) => {
+app.get("/signers/:city", requireSignedUser, requireNoSig, (req, res) => {
     db.getCity(req.params.city).then((results) => {
         res.render("signers", {
             layout: "main",
@@ -298,7 +298,7 @@ app.get("/signers/:city", requireNoSig, (req, res) => {
     });
 });
 
-app.get("/editprofile", requireNoSig, (req, res) => {
+app.get("/editprofile", requireSignedUser, (req, res) => {
     db.getInfo(req.session.user_id)
         .then((results) => {
             res.render("editprofile", {
@@ -311,7 +311,7 @@ app.get("/editprofile", requireNoSig, (req, res) => {
         });
 });
 
-app.post("/editprofile", requireNoSig, (req, res) => {
+app.post("/editprofile", requireSignedUser, (req, res) => {
     if (req.body.pwd) {
         hash(req.body.pwd).then((hashedPwd) => {
             db.updatePassword(req.session.user_id, hashedPwd)
@@ -363,7 +363,7 @@ app.post("/editprofile", requireNoSig, (req, res) => {
 
 app.get("/logout", (req, res) => {
     req.session = null;
-    res.redirect("/");
+    res.redirect("/reg");
 });
 
 //if running on Heroku liten on Heroku port(environment), otherwise, listen locally

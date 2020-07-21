@@ -19,7 +19,7 @@ module.exports.logCreds = (first, last, email, pwd) => {
         "INSERT INTO users (first, last, email, pwd) VALUES ($1, $2, $3, $4)RETURNING id";
 
     let params = [first, last, email, pwd];
-    //console.log("params:", params);
+    console.log("params in logCreds:", params);
     return db.query(q, params);
 };
 
@@ -36,6 +36,7 @@ module.exports.getPwd = function (email) {
         "SELECT users.first, users.pwd, users.id, signatures.id AS sigid FROM users JOIN signatures ON users.id = signatures.user_id WHERE users.email = $1";
 
     let params = [email];
+    console.log("q, params: ", q, params);
     return db.query(q, params);
 };
 
