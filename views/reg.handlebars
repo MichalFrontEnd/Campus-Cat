@@ -2,8 +2,12 @@
 
 {{!--Error handling--}}
 {{#if error}}
-<h3>please fill in all fields!</h3>
+<h3 class="error">Please fill in all fields!</h3>
 {{/if}}
+{{#if duplicateKey}}
+<h3 class="error">Some other cat haz your email!</h3>
+{{/if}}
+
 {{!--<img>--}}
 
 <section class="pagebody">

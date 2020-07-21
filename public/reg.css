@@ -69,7 +69,7 @@ footer,
 
 .reg_form {
     visibility: hidden;
-    transition: 2s;
+    transition: 3s;
     border-left: black 4px solid;
     border-bottom: black 3px solid;
     grid-area: 1 / 10 / span 4 / span 3;
@@ -104,7 +104,7 @@ footer,
 .reg_form_on {
     visibility: visible;
     transition-property: transform;
-    transition-duration: 2s;
+    transition-duration: 4s;
     z-index: 10;
     /*transform: translateY(-100%);*/
 }
