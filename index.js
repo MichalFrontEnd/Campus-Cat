@@ -57,13 +57,13 @@ app.get("/home", (req, res) => {
     });
 });
 
-app.get("/reg", (req, res) => {
+app.get("/reg", requireHasSig, (req, res) => {
     res.render("reg", {
         layout: "main",
     });
 });
 
-app.post("/reg", (req, res) => {
+app.post("/reg", requireHasSig, (req, res) => {
     hash(req.body.pwd)
         .then((hashedPwd) => {
             db.logCreds(
@@ -73,11 +73,6 @@ app.post("/reg", (req, res) => {
                 hashedPwd
             )
                 .then((results) => {
-                    console.log("results in post register: ", results);
-                    console.log(
-                        "req.body.first in post register: ",
-                        req.body.first
-                    );
                     //storing the user_id and name in the cookie:
                     req.session.user_id = results.rows[0].id;
                     req.session.hasUserId = true;
@@ -232,7 +227,7 @@ app.post("/petition", requireHasSig, (req, res) => {
     db.addSignatures(req.session.user_id, req.body.signature)
         .then((results) => {
             //storing the signature id in the cookie
-            
+
             req.session.sigId = results.rows[0].id;
             res.redirect("/thankyou");
             //console.log('req.session after addSignatures: ', req.session);
@@ -246,15 +241,12 @@ app.post("/petition", requireHasSig, (req, res) => {
         });
 });
 
-app.get("/thankyou", requireHasSig, (req, res) => {
+app.get("/thankyou", requireNoSig, (req, res) => {
     db.sigNumber()
         .then((results) => {
             signers = results.rows[0].count;
             db.getSigUrl(req.session.user_id)
                 .then((results) => {
-
-                        req.session.first
-                    );
                     res.render("thankyou", {
                         layout: "main",
                         thanks: `Thank you ${req.session.first}, for your paw-print!`,
@@ -271,7 +263,7 @@ app.get("/thankyou", requireHasSig, (req, res) => {
         });
 });
 
-app.post("/thankyou", requireHasSig, (req, res) => {
+app.post("/thankyou", requireNoSig, (req, res) => {
     db.deleteSig(req.session.user_id)
         .then((results) => {
             req.session.hasSigId = false;
