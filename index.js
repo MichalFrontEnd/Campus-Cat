@@ -4,12 +4,7 @@ const cookieSession = require("cookie-session");
 const { hash, compare } = require("./bc");
 const hb = require("express-handlebars");
 const db = require("./db");
-const {
-    requireSignedUser,
-    requireHasSig,
-    requireNoSig,
-    requireLoggedIn,
-} = require("./middleware");
+const { requireSignedUser, requireHasSig, requireNoSig, requireLoggedIn } = require("./middleware");
 const csurf = require("csurf");
 
 //const { body, validationResult, sanitizeBody } = require("express-validator");
@@ -37,22 +32,23 @@ app.use(function (req, res, next) {
 });
 
 let signers;
-let first;
-let last;
-let email;
-let userPwd;
-let user_id;
 
 app.get("/", (req, res) => {
     if (req.session.user_id) {
         res.redirect("/home");
     } else {
-        res.redirect("/reg");
+        res.redirect("/welcome");
     }
 });
 
 app.get("/home", (req, res) => {
     res.render("home", {
+        layout: "main",
+    });
+});
+
+app.get("/welcome", requireHasSig, requireNoSig, (req, res) => {
+    res.render("welcome", {
         layout: "main",
     });
 });
@@ -66,12 +62,7 @@ app.get("/reg", requireHasSig, requireNoSig, (req, res) => {
 app.post("/reg", requireHasSig, requireNoSig, (req, res) => {
     hash(req.body.pwd)
         .then((hashedPwd) => {
-            db.logCreds(
-                req.body.first,
-                req.body.last,
-                req.body.email,
-                hashedPwd
-            )
+            db.logCreds(req.body.first, req.body.last, req.body.email, hashedPwd)
                 .then((results) => {
                     //storing the user_id and name in the cookie:
                     req.session.user_id = results.rows[0].id;
@@ -114,20 +105,11 @@ app.post("/newprofile", (req, res) => {
     //if (req.body.age || req.body.city || req.body.homepage) {
     if (!req.body.homepage) {
         req.body.hompage = "";
-    } else if (
-        !req.body.homepage.startsWith("http://") &&
-        !req.body.homepage.startsWith("https://") &&
-        !req.body.homepage.startsWith("//")
-    ) {
+    } else if (!req.body.homepage.startsWith("http://") && !req.body.homepage.startsWith("https://") && !req.body.homepage.startsWith("//")) {
         req.body.homepage = "http://" + req.body.homepage;
     }
 
-    db.logProfiles(
-        [req.body.age],
-        req.body.city,
-        req.body.homepage,
-        req.session.user_id
-    )
+    db.logProfiles([req.body.age], req.body.city, req.body.homepage, req.session.user_id)
         .then(() => {
             //console.log('results in logprofiles: ', results);
             res.redirect("/petition");
@@ -325,27 +307,10 @@ app.post("/editprofile", requireSignedUser, (req, res) => {
     }
     if (!req.body.homepage) {
         req.body.hompage = "";
-    } else if (
-        !req.body.homepage.startsWith("http://") &&
-        !req.body.homepage.startsWith("https://") &&
-        !req.body.homepage.startsWith("//")
-    ) {
+    } else if (!req.body.homepage.startsWith("http://") && !req.body.homepage.startsWith("https://") && !req.body.homepage.startsWith("//")) {
         req.body.homepage = "http://" + req.body.homepage;
     }
-    Promise.all([
-        db.updateInfo(
-            req.session.user_id,
-            req.body.first,
-            req.body.last,
-            req.body.email
-        ),
-        db.upsertInfo(
-            req.session.user_id,
-            req.body.age,
-            req.body.city,
-            req.body.homepage
-        ),
-    ])
+    Promise.all([db.updateInfo(req.session.user_id, req.body.first, req.body.last, req.body.email), db.upsertInfo(req.session.user_id, req.body.age, req.body.city, req.body.homepage)])
         .then(() => {
             profileUpdate = true;
             if (req.body.first) {
@@ -363,10 +328,8 @@ app.post("/editprofile", requireSignedUser, (req, res) => {
 
 app.get("/logout", (req, res) => {
     req.session = null;
-    res.redirect("/reg");
+    res.redirect("/welcome");
 });
 
 //if running on Heroku liten on Heroku port(environment), otherwise, listen locally
-app.listen(process.env.PORT || 8080, () =>
-    console.log("petition server is listening...")
-);
+app.listen(process.env.PORT || 8080, () => console.log("petition server is listening..."));

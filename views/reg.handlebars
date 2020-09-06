@@ -8,51 +8,35 @@
 <h3 class="error">Some other cat haz your email!</h3>
 {{/if}}
 
-{{!--<img>--}}
-
-<section class="pagebody">
-    {{!--<h1>Bla bla support the cause</h1>--}}
-    {{!----}}
-
+<div class="pagebody">
     <div class="jumbotron"></div>
     <img src="CampusCat.jpg" alt="kitty holding a sign" class="kittysign">
-    <section class="sidebar">
-        <p class="intro"><span>Cats make us happy.</span><br>
-            They support us when we're sad or stressed and their purring has a calming effect.
-            Every Campus should have a cat, for the wellbeing of the students.<br> We here at Spiced should set
-            an example.
-            <br><br>
-            Agree?
-            <br>
-            High-five the paw to sign the petition:
-            <br>
-        </p>
-        <img id="show_pet" src="Catpaw.png">
+    <div class="sidebar">
+        <form class="reg_form" method="POST">
+            <a href="/welcome">
+                <img id="hide_pet" src="Catpaw.png">
+            </a>
+            <label>Your Name</label>
+            <input name="first" type="text">
+
+            <label>Your Last Name</label>
+            <input name="last" type="text">
+
+            <label>Your Email Address</label>
+            <input name="email" type="text">
+
+            <label>Your New Password</label>
+            <input name="pwd" type="password">
+
+
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <button type="submit" id="signup">Sign meowe up!</button>
+
+        </form>
         <p id="ar_mem">Already a member? <br>please <a href="/login">meow-in</a>!</p>
 
-    </section>
     </div>
-    <form class="reg_form" method="POST">
-        <img id="hide_pet" src="Catpaw.png">
-        <span>Cats make us happy.</span>
-        <label>Your Name</label>
-        <input name="first" type="text">
 
-        <label>Your Last Name</label>
-        <input name="last" type="text">
-
-        <label>Your Email Address</label>
-        <input name="email" type="text">
-
-        <label>Your New Password</label>
-        <input name="pwd" type="password">
-
-
-        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-        <button type="submit" id="signup">Sign meowe up!</button>
-
-    </form>
-
-</section>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="/reg.js"></script>
+</div>
+{{!--<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>--}}
+{{!--<script src="/reg.js"></script>--}}
