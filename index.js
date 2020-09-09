@@ -7,7 +7,6 @@ const db = require("./db");
 const { requireSignedUser, requireHasSig, requireNoSig, requireLoggedIn } = require("./middleware");
 const csurf = require("csurf");
 
-//const { body, validationResult, sanitizeBody } = require("express-validator");
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
@@ -19,7 +18,6 @@ app.use(
 );
 
 app.use(express.static("./public"));
-//app.use(express.static("./"));
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -102,7 +100,6 @@ app.get("/newprofile", (req, res) => {
 });
 
 app.post("/newprofile", (req, res) => {
-    //if (req.body.age || req.body.city || req.body.homepage) {
     if (!req.body.homepage) {
         req.body.hompage = "";
     } else if (!req.body.homepage.startsWith("http://") && !req.body.homepage.startsWith("https://") && !req.body.homepage.startsWith("//")) {
@@ -111,27 +108,19 @@ app.post("/newprofile", (req, res) => {
 
     db.logProfiles([req.body.age], req.body.city, req.body.homepage, req.session.user_id)
         .then(() => {
-            //console.log('results in logprofiles: ', results);
             res.redirect("/petition");
         })
         .catch((err) => {
             console.log("error in post/newprofile", err);
         });
-    //} else {
-    //    res.redirect("/petition");
-    //}
 });
 
 app.get("/login", (req, res) => {
     res.render("login", {
         layout: "main",
     });
-    //getting the credentials from the db Do I need this?
-
     db.getCreds()
-        .then((results) => {
-            //console.log("getCreds results: ", results);
-        })
+        .then((results) => {})
         .catch((err) => {
             console.log("err in GET /login getting creds: ", err);
         });
@@ -141,7 +130,6 @@ app.post("/login", (req, res) => {
     //getting the hashed pwd from the db using the email.
 
     if (req.body.email) {
-        //console.log("req.body.email: ", req.body.email);
         db.getPwd(req.body.email)
             .then((results) => {
                 console.log("results in getPwd: ", results);
@@ -151,11 +139,9 @@ app.post("/login", (req, res) => {
                         error: true,
                     });
                 } else {
-                    //comparing the user input pwd and the hashed pwd
                     compare(req.body.pwd, results.rows[0].pwd)
                         .then((matchValue) => {
                             if (matchValue === true) {
-                                //req.session.email = req.body.email;
                                 req.session.first = results.rows[0].first;
                                 req.session.user_id = results.rows[0].id;
                                 req.session.sigId = results.rows[0].sigid;
@@ -191,14 +177,6 @@ app.post("/login", (req, res) => {
     }
 });
 
-//app.use(function reroute(req, res, next) {
-//    if (req.session === null) {
-//        res.redirect("/reg");
-//    } else{
-//next;
-//}
-//});
-
 app.get("/petition", requireSignedUser, requireHasSig, (req, res) => {
     res.render("petition", {
         layout: "main",
@@ -212,7 +190,6 @@ app.post("/petition", requireSignedUser, requireHasSig, (req, res) => {
 
             req.session.sigId = results.rows[0].id;
             res.redirect("/thankyou");
-            //console.log('req.session after addSignatures: ', req.session);
         })
         .catch((err) => {
             console.log("err in POST /petition: ", err);
@@ -297,9 +274,7 @@ app.post("/editprofile", requireSignedUser, (req, res) => {
     if (req.body.pwd) {
         hash(req.body.pwd).then((hashedPwd) => {
             db.updatePassword(req.session.user_id, hashedPwd)
-                .then((results) => {
-                    //console.log("Password changed successfuly");
-                })
+                .then((results) => {})
                 .catch((err) => {
                     console.log("error in updatePassword", err);
                 });
