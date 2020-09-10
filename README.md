@@ -19,4 +19,4 @@ Deployed on Heroku.
 
 
 ### Preview
-![alt text](https://github.com/MichalFrontEnd/Campus-Cat/blob/master/public/Campus%20Cat%20Preview.gif "Campus Cat Preview Gif")
+! [alt text](https://github.com/MichalFrontEnd/Campus-Cat/blob/master/public/Campus%20Cat%20Preview.gif "Campus Cat Preview Gif")
