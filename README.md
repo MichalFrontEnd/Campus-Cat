@@ -17,7 +17,7 @@ Deployed on Heroku.
 * Signers page, can be filtered by city
 * Routing middleware that allows only logged-in users to view certain pages, and redirects logged-out users to the registration page.
 
-###Disclaimer
+### Disclaimer
 Most of the photos on this project were downloaded from google. I do not own the rights for them, and if the owners of the photos request it, they will be removed from the project.
 
 ### Preview
